@@ -16,6 +16,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 package-lock.json
+CBT-D/tests/node_modules/
+CBT-D/tests/package-lock.json
 
 # Angular build output
 dist/
