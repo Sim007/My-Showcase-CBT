@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
+import { APP_VERSION } from '../version';
 
 @Component({
   selector: 'app-footer',
@@ -10,4 +11,5 @@ import { MatDividerModule } from '@angular/material/divider';
 })
 export class FooterComponent {
   readonly year = new Date().getFullYear();
+  readonly version = APP_VERSION;
 }

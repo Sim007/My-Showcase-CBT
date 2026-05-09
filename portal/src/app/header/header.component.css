@@ -2,6 +2,13 @@
   font-size: 1.2rem;
   font-weight: 500;
   letter-spacing: 0.05em;
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.portal-title:hover {
+  opacity: 0.85;
 }
 
 .spacer {
