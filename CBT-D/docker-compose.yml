@@ -47,7 +47,7 @@ services:
     build:
       context: ../order/frontend
     ports:
-      - "4201:80"
+      - "4201:8080"
 
   # ── Payment squad ───────────────────────────────────
   payment-backend:
@@ -76,7 +76,7 @@ services:
     build:
       context: ../payment/frontend
     ports:
-      - "4202:80"
+      - "4202:8080"
 
   # ── Notification squad ──────────────────────────────
   notification:
@@ -99,14 +99,14 @@ services:
     build:
       context: ../notification/frontend
     ports:
-      - "4203:80"
+      - "4203:8080"
 
   # ── Platform squad (portal) ─────────────────────────
   portal-shell:
     build:
       context: ../portal
     ports:
-      - "4200:80"
+      - "4200:8080"
     depends_on:
       - mf-order
       - mf-payments

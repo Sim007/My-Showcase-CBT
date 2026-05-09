@@ -21,7 +21,7 @@ class SoapClient(
               <soapenv:Header/>
               <soapenv:Body>
                 <tns:AuthorizeRequest>
-                  <tns:orderId>$orderId</tns:orderId>
+                  <tns:orderId>${orderId.escapeXml()}</tns:orderId>
                   <tns:amount>$amount</tns:amount>
                 </tns:AuthorizeRequest>
               </soapenv:Body>
@@ -42,6 +42,13 @@ class SoapClient(
 
         return parseSoapResponse(response.body ?: "")
     }
+
+    private fun String.escapeXml(): String = this
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace("\"", "&quot;")
+        .replace("'", "&apos;")
 
     private fun parseSoapResponse(xml: String): SoapAuthorizeResult {
         val transactionId = Regex("<tns:transactionId>(.*?)</tns:transactionId>").find(xml)?.groupValues?.get(1)
