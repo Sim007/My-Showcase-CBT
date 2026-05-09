@@ -1,4 +1,4 @@
-name: Contract Tests
+name: CBT-D – Contract Tests
 
 on:
   push:
