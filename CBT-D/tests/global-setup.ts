@@ -1,14 +1,21 @@
 import { FullConfig } from '@playwright/test';
 
-const SERVICES = [
+const BACKEND_SERVICES = [
   { name: 'order backend',        url: 'http://localhost:8080/actuator/health' },
   { name: 'payment backend',      url: 'http://localhost:8081/actuator/health' },
   { name: 'notification backend', url: 'http://localhost:8082/actuator/health' },
+];
+
+const FRONTEND_SERVICES = [
   { name: 'portal shell',         url: 'http://localhost:4200' },
   { name: 'mf-order',             url: 'http://localhost:4201/remoteEntry.json' },
   { name: 'mf-payments',          url: 'http://localhost:4202/remoteEntry.json' },
   { name: 'mf-notifications',     url: 'http://localhost:4203/remoteEntry.json' },
 ];
+
+const SERVICES = process.env.CI
+  ? BACKEND_SERVICES
+  : [...BACKEND_SERVICES, ...FRONTEND_SERVICES];
 
 async function waitFor(name: string, url: string, timeoutMs = 120_000): Promise<void> {
   const deadline = Date.now() + timeoutMs;
