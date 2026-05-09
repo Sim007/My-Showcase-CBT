@@ -29,18 +29,16 @@ command -v npm    >/dev/null 2>&1 || fail "npm niet gevonden"
 # 2. Poorten vrijmaken
 # ---------------------------------------------------------------------------
 PORTS=(4200 4201 4202 4203 5672 8080 8081 8082 8083 15672)
-log "Poorten controleren en vrijmaken..."
+log "Bestaande containers stoppen..."
+docker compose -f "$ROOT/docker-compose.yml" down --remove-orphans 2>/dev/null || true
+
+log "Poorten controleren op overgebleven processen..."
 for port in "${PORTS[@]}"; do
   PIDS=$(lsof -ti :"$port" 2>/dev/null || true)
   if [ -n "$PIDS" ]; then
     for pid in $PIDS; do
       CMD=$(ps -p "$pid" -o comm= 2>/dev/null || echo "onbekend")
-      case "$CMD" in
-        *docker*|*Docker*|*vpnkit*|*com.docker*)
-          warn "Poort $port in gebruik door Docker ($CMD) — overgeslagen" ;;
-        *)
-          kill "$pid" 2>/dev/null && warn "Poort $port vrijgemaakt — $CMD (PID $pid) gestopt" ;;
-      esac
+      kill "$pid" 2>/dev/null && warn "Poort $port vrijgemaakt — $CMD (PID $pid) gestopt"
     done
   fi
 done
