@@ -27,7 +27,7 @@ jobs:
           node-version: '20'
 
       - name: Start infrastructure (RabbitMQ + WireMock + services)
-        working-directory: infra
+        working-directory: CBT-D
         run: |
           docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d \
             rabbitmq wiremock order payment-backend notification
@@ -86,5 +86,5 @@ jobs:
 
       - name: Stop services
         if: always()
-        working-directory: infra
+        working-directory: CBT-D
         run: docker compose -f docker-compose.yml -f docker-compose.ci.yml down

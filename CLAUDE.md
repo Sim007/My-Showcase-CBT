@@ -17,8 +17,8 @@ Bij elke wijziging in dit project moeten **alle onderstaande afhankelijkheden** 
 - [ ] Playwright contract-spec in `tests/type0/*-contract.spec.ts`
 - [ ] Playwright UI-spec in `tests/type0/*.spec.ts` (navigatie via routes, niet tabs)
 - [ ] `README.md` — type-tabel, projectstructuur, contractenlijst
-- [ ] `start.sh` — `wait_for` voor nieuwe health endpoint
-- [ ] `sts.sh` — env vars en `wait_for`
+- [ ] `CBT-D/start.sh` — `wait_for` voor nieuwe health endpoint
+- [ ] `CBT-D/sts.sh` — env vars en `wait_for`
 - [ ] `.github/workflows/contract-tests.yml` — env vars en teststap
 
 ### Contract gewijzigd (`contracts/`)
@@ -31,14 +31,14 @@ Bij elke wijziging in dit project moeten **alle onderstaande afhankelijkheden** 
 - [ ] `tests/package.json` — scripts bijwerken
 - [ ] `.github/workflows/contract-tests.yml` — stap hernoemen + env vars
 - [ ] `README.md` — testcommando's bijwerken
-- [ ] `start.sh` — instructietekst
-- [ ] `sts.sh` — als er gefilterd wordt op type
+- [ ] `CBT-D/start.sh` — instructietekst
+- [ ] `CBT-D/sts.sh` — als er gefilterd wordt op type
 
 ### Nieuwe service of poort
-- [ ] `infra/docker-compose.yml` — service + healthcheck
-- [ ] `infra/docker-compose.ci.yml` — CI-override
+- [ ] `CBT-D/docker-compose.yml` — service + healthcheck
+- [ ] `CBT-D/docker-compose.ci.yml` — CI-override
 - [ ] `payment/shell/proxy.conf.json` en `nginx.conf` (Shell proxiet alle API-calls)
-- [ ] `start.sh` en `sts.sh` — `wait_for` + env vars
+- [ ] `CBT-D/start.sh` en `CBT-D/sts.sh` — `wait_for` + env vars
 - [ ] `.github/workflows/contract-tests.yml` — env vars
 - [ ] `README.md` — poorttabel
 
@@ -49,12 +49,12 @@ Bij elke wijziging in dit project moeten **alle onderstaande afhankelijkheden** 
 - [ ] Portal `webpack.config.js` — remote entry toevoegen
 - [ ] Portal `app.routes.ts` — `loadRemoteModule` route toevoegen
 - [ ] Portal `proxy.conf.json` + `nginx.conf` — API-route toevoegen
-- [ ] `infra/docker-compose.yml` — backend + frontend containers (profiel `local`)
-- [ ] `start.sh` / `stop.sh` / `sts.sh` — nieuwe poorten toevoegen
+- [ ] `CBT-D/docker-compose.yml` — backend + frontend containers (profiel `local`)
+- [ ] `CBT-D/start.sh` / `CBT-D/stop.sh` / `CBT-D/sts.sh` — nieuwe poorten toevoegen
 - [ ] `docs/architecture.drawio` + `docs/architecture.png` bijwerken
 - [ ] `README.md` + `CLAUDE.md` — poorttabel + structuur
 
-### Scripts gewijzigd (`start.sh`, `stop.sh`, `sts.sh`)
+### Scripts gewijzigd (`CBT-D/start.sh`, `CBT-D/stop.sh`, `CBT-D/sts.sh`)
 - [ ] `README.md` — scripttabel en opstartinstructies synchroon houden
 
 ---

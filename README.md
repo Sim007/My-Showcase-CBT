@@ -30,7 +30,7 @@ Bedoeld voor een tribe met 10 feature squads + 1 platform squad.
 | Messaging      | RabbitMQ 4 (Alpine)                                   |
 | Tests          | Playwright + AJV schema validatie                     |
 | SOAP mock      | WireMock 3                                            |
-| Infra          | Docker Compose — alle images Alpine, behalve WireMock (geen ARM64 Alpine beschikbaar) |
+| Infra          | Docker Compose (`CBT-D/`) — alle images Alpine, behalve WireMock (geen ARM64 Alpine beschikbaar) |
 | CI             | GitHub Actions                                        |
 
 ## Projectstructuur
@@ -54,10 +54,13 @@ Bedoeld voor een tribe met 10 feature squads + 1 platform squad.
 │   ├── backend/              # Spring Boot service (poort 8082)
 │   └── frontend/             # mf-notifications – Angular MF (poort 4203)
 ├── portal/                   # Platform squad – Angular shell (poort 4200)
-├── infra/
+├── CBT-D/                    # Docker deployment context
 │   ├── docker-compose.yml
 │   ├── docker-compose.ci.yml
-│   └── wiremock/mappings/                  # SOAP mock responses
+│   ├── wiremock/mappings/                  # SOAP mock responses
+│   ├── start.sh              # Start alle services via Docker Compose
+│   ├── stop.sh               # Stop alle Docker services
+│   └── sts.sh                # Start → Test → Stop in één keer
 ├── tests/
 │   ├── type0/   # UI + contract API tests (Angular → Backend)
 │   ├── type1/   # REST tussen deelsystemen (Order → Payment)
@@ -76,37 +79,39 @@ Bedoeld voor een tribe met 10 feature squads + 1 platform squad.
 
 ### Scripts
 
-| Script     | Omschrijving                                              |
-|------------|-----------------------------------------------------------|
-| `start.sh` | Start alle services via Docker Compose en wacht op health |
-| `stop.sh`  | Stopt alle Docker services                                |
-| `sts.sh`   | **Start → Test → Stop** in één keer (voor CI/demo)        |
+| Script          | Omschrijving                                              |
+|-----------------|-----------------------------------------------------------|
+| `CBT-D/start.sh` | Start alle services via Docker Compose en wacht op health |
+| `CBT-D/stop.sh`  | Stopt alle Docker services                                |
+| `CBT-D/sts.sh`   | **Start → Test → Stop** in één keer (voor CI/demo)        |
 
 #### Start en handmatig testen
 
 ```bash
+cd CBT-D
 ./start.sh          # bouwt en start alles in Docker, wacht tot alle services gezond zijn
 
+cd ..
 npx playwright test            # alle types
 npm run test:type0             # alleen UI tests (Angular → Backend)
 npm run test:type1             # alleen REST tussen deelsystemen (Order → Payment)
 npm run test:type2             # alleen queue tests (Payment → Notification)
 npm run test:type3             # alleen SOAP tests (Payment → WireMock)
 
-./stop.sh           # stopt alles netjes af
+cd CBT-D && ./stop.sh           # stopt alles netjes af
 ```
 
 #### Volledig geautomatiseerd (start + test + stop)
 
 ```bash
-./sts.sh
+cd CBT-D && ./sts.sh
 ```
 
 ### Handmatig via Docker Compose
 
 ```bash
 # Alle services (backends + frontends + RabbitMQ + WireMock)
-docker compose -f infra/docker-compose.yml up --build
+docker compose -f CBT-D/docker-compose.yml up --build
 ```
 
 ### Omgevingsvariabelen voor tests
@@ -118,7 +123,7 @@ export NOTIFICATION_URL=http://localhost:8082
 export WIREMOCK_URL=http://localhost:8083
 ```
 
-> `start.sh` toont deze commando's automatisch na het opstarten.
+> `CBT-D/start.sh` toont deze commando's automatisch na het opstarten.
 
 ## WireMock SOAP-gedrag
 

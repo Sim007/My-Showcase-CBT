@@ -8,22 +8,15 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-log()  { echo -e "${GREEN}[sts]${NC} $*"; }
-warn() { echo -e "${YELLOW}[sts]${NC} $*"; }
-fail() { echo -e "${RED}[sts]${NC} $*" >&2; exit 1; }
-
-cleanup() {
-  warn "Services stoppen..."
-  docker compose -f "$ROOT/infra/docker-compose.yml" down --remove-orphans
-}
-trap cleanup EXIT
+log()  { echo -e "${GREEN}[start]${NC} $*"; }
+warn() { echo -e "${YELLOW}[start]${NC} $*"; }
+fail() { echo -e "${RED}[start]${NC} $*" >&2; exit 1; }
 
 # ---------------------------------------------------------------------------
 # 1. Vereisten controleren
 # ---------------------------------------------------------------------------
 log "Vereisten controleren..."
 command -v docker >/dev/null 2>&1 || fail "Docker niet gevonden"
-command -v npm    >/dev/null 2>&1 || fail "npm niet gevonden"
 
 # ---------------------------------------------------------------------------
 # 2. Poorten vrijmaken
@@ -41,21 +34,13 @@ for port in "${PORTS[@]}"; do
 done
 
 # ---------------------------------------------------------------------------
-# 3. Playwright browsers installeren
+# 3. Alle services opstarten via Docker Compose
 # ---------------------------------------------------------------------------
-log "Playwright browsers installeren..."
-cd "$ROOT"
-npx playwright install chromium --with-deps 2>/dev/null || npx playwright install chromium
+log "Alle services opstarten (Docker Compose)..."
+docker compose -f "$ROOT/docker-compose.yml" up --build -d
 
 # ---------------------------------------------------------------------------
-# 4. Docker Compose opstarten (alles)
-# ---------------------------------------------------------------------------
-log "Docker Compose opstarten..."
-cd "$ROOT"
-docker compose -f infra/docker-compose.yml up --build -d
-
-# ---------------------------------------------------------------------------
-# 5. Wachten op health endpoints
+# 4. Wachten op health endpoints
 # ---------------------------------------------------------------------------
 wait_for() {
   local name="$1"
@@ -70,7 +55,7 @@ wait_for() {
   log "$name gereed"
 }
 
-log "Wachten op health endpoints..."
+log "Wachten op services..."
 wait_for "WireMock"          "http://localhost:8083/__admin/health"
 wait_for "Notification"      "http://localhost:8082/actuator/health"
 wait_for "Payment"           "http://localhost:8081/actuator/health"
@@ -80,24 +65,7 @@ wait_for "mf-payments"       "http://localhost:4202/remoteEntry.json"
 wait_for "mf-notifications"  "http://localhost:4203/remoteEntry.json"
 wait_for "Portal shell"      "http://localhost:4200"
 
-# ---------------------------------------------------------------------------
-# 6. Playwright tests draaien
-# ---------------------------------------------------------------------------
-log "Tests draaien..."
-cd "$ROOT"
-
-export ORDER_URL="http://localhost:8080"
-export PAYMENT_URL="http://localhost:8081"
-export NOTIFICATION_URL="http://localhost:8082"
-export WIREMOCK_URL="http://localhost:8083"
-
-EXIT_CODE=0
-npx playwright test || EXIT_CODE=$?
-
-if [ "$EXIT_CODE" -eq 0 ]; then
-  log "Alle tests geslaagd."
-else
-  warn "Er zijn testfouten. Bekijk het rapport: playwright-report/index.html"
-fi
-
-exit "$EXIT_CODE"
+log "Alle services draaien. Gebruik './stop.sh' om alles te stoppen."
+log ""
+log "Tests starten (vanuit projectroot):"
+log "  npx playwright test"
