@@ -29,15 +29,6 @@ jobs:
           docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d \
             rabbitmq wiremock order payment-backend notification
 
-      - name: Wacht op health endpoints
-        run: |
-          npx wait-on \
-            http://localhost:8080/actuator/health \
-            http://localhost:8081/actuator/health \
-            http://localhost:8082/actuator/health \
-            http://localhost:8083/__admin/health \
-            --timeout 120000
-
       - name: Installeer Playwright
         working-directory: CBT-D/tests
         run: |
