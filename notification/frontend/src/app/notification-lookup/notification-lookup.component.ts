@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -32,7 +32,7 @@ export class NotificationLookupComponent {
   errorMessage: string | null = null;
   isLoading = false;
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {}
+  constructor(private fb: FormBuilder, private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
   search(): void {
     if (this.form.invalid) return;
@@ -40,8 +40,8 @@ export class NotificationLookupComponent {
     this.isLoading = true;
 
     this.http.get<Notification[]>(`/api/notifications?orderId=${this.form.value.orderId}`).subscribe({
-      next: r => { this.notifications = r; this.searched = true; this.isLoading = false; },
-      error: e => { this.errorMessage = e.error?.message ?? 'Er is een fout opgetreden'; this.isLoading = false; },
+      next: r => { this.notifications = r; this.searched = true; this.isLoading = false; this.cdr.detectChanges(); },
+      error: e => { this.errorMessage = e.error?.message ?? 'Er is een fout opgetreden'; this.isLoading = false; this.cdr.detectChanges(); },
     });
   }
 }

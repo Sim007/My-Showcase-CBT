@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -32,7 +32,7 @@ export class PaymentFormComponent {
   errorMessage: string | null = null;
   isLoading = false;
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {}
+  constructor(private fb: FormBuilder, private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
   submit(): void {
     if (this.form.invalid) return;
@@ -42,8 +42,8 @@ export class PaymentFormComponent {
       orderId: this.form.value.orderId,
       amount:  this.form.value.amount,
     }).subscribe({
-      next: r => { this.paymentStatus = r.status; this.isLoading = false; },
-      error: e => { this.errorMessage = e.error?.message ?? 'Er is een fout opgetreden'; this.isLoading = false; },
+      next: r => { this.paymentStatus = r.status; this.isLoading = false; this.cdr.detectChanges(); },
+      error: e => { this.errorMessage = e.error?.message ?? 'Er is een fout opgetreden'; this.isLoading = false; this.cdr.detectChanges(); },
     });
   }
 }
