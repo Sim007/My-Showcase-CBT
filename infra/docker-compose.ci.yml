@@ -1,0 +1,30 @@
+version: "3.9"
+
+# CI-override: geen persistente volumes, geen frontend, snellere timeouts
+# Gebruik: docker compose -f docker-compose.yml -f docker-compose.ci.yml up
+
+services:
+
+  rabbitmq:
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+
+  order:
+    environment:
+      - PAYMENT_SERVICE_URL=http://payment-backend:8081
+    restart: "no"
+
+  payment-backend:
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SOAP_PROVIDER_URL=http://wiremock:8080/soap/payment
+    restart: "no"
+
+  notification:
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+    restart: "no"
+
+  wiremock:
+    restart: "no"

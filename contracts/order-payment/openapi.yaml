@@ -1,0 +1,74 @@
+openapi: "3.0.3"
+info:
+  title: Payment API
+  description: Contract tussen Order-service (consumer) en Payment-service (provider)
+  version: "1.0.0"
+
+servers:
+  - url: http://localhost:8081
+
+paths:
+  /api/payments:
+    post:
+      summary: Verwerk een betaling voor een order
+      operationId: processPayment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+      responses:
+        '200':
+          description: Betaling verwerkt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+        '400':
+          description: Ongeldige invoer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    PaymentRequest:
+      type: object
+      required: [orderId, amount]
+      properties:
+        orderId:
+          type: string
+          example: "order-123"
+        amount:
+          type: number
+          format: double
+          minimum: 0.01
+          example: 49.95
+
+    PaymentResponse:
+      type: object
+      required: [paymentId, orderId, status, approved]
+      properties:
+        paymentId:
+          type: string
+          example: "pay-abc-001"
+        orderId:
+          type: string
+          example: "order-123"
+        status:
+          type: string
+          enum: [APPROVED, REJECTED]
+          example: "APPROVED"
+        approved:
+          type: boolean
+          example: true
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string

@@ -1,0 +1,19 @@
+server:
+  port: 8080
+
+payment:
+  service:
+    url: http://payment-backend:8081
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+spring:
+  application:
+    name: order-service

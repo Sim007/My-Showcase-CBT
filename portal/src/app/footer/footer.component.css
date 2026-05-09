@@ -1,0 +1,13 @@
+footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  font-size: 0.8rem;
+  color: #666;
+  background: #fafafa;
+}
+
+.mf-info {
+  font-style: italic;
+}

@@ -1,0 +1,43 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Betaling verwerken</mat-card-title>
+    <mat-card-subtitle>POST /api/payments</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Order ID</mat-label>
+        <input matInput formControlName="orderId"
+               data-testid="order-id" placeholder="bijv. order-123" autocomplete="off" />
+        <mat-error *ngIf="form.get('orderId')?.invalid">Order ID is verplicht</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Bedrag (€)</mat-label>
+        <input matInput type="number" formControlName="amount"
+               data-testid="amount" placeholder="49.95" step="0.01" min="0.01" />
+        <mat-error *ngIf="form.get('amount')?.invalid">Voer een geldig bedrag in</mat-error>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" type="submit"
+              data-testid="submit-payment" [disabled]="isLoading || form.invalid">
+        @if (isLoading) { <mat-spinner diameter="18" /> } @else { Betaal }
+      </button>
+    </form>
+  </mat-card-content>
+
+  @if (paymentStatus) {
+    <mat-card-content>
+      <p class="status" [class.approved]="paymentStatus === 'APPROVED'" [class.rejected]="paymentStatus === 'REJECTED'">
+        <span data-testid="payment-status">{{ paymentStatus }}</span>
+      </p>
+    </mat-card-content>
+  }
+
+  @if (errorMessage) {
+    <mat-card-content>
+      <p class="error" data-testid="error-message">{{ errorMessage }}</p>
+    </mat-card-content>
+  }
+</mat-card>

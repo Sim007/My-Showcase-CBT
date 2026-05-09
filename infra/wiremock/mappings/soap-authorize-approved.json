@@ -1,0 +1,21 @@
+{
+  "name": "SOAP authorize - happy path (orderId != 999)",
+  "priority": 2,
+  "request": {
+    "method": "POST",
+    "url": "/soap/payment",
+    "bodyPatterns": [
+      {
+        "matchesXPath": "//*[local-name()='orderId' and not(text()='999')]"
+      }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "text/xml;charset=UTF-8"
+    },
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tns=\"http://showcase.nl/payment/external\"><soapenv:Header/><soapenv:Body><tns:AuthorizeResponse><tns:transactionId>txn-{{randomValue type='UUID'}}</tns:transactionId><tns:approved>true</tns:approved></tns:AuthorizeResponse></soapenv:Body></soapenv:Envelope>",
+    "transformers": ["response-template"]
+  }
+}

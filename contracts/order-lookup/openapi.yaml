@@ -1,0 +1,51 @@
+openapi: "3.0.3"
+info:
+  title: Order Lookup API
+  description: Contract voor het opzoeken van een order op ID (Angular → Order service)
+  version: "1.0.0"
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /api/orders/{orderId}:
+    get:
+      summary: Haal een order op via ID
+      operationId: getOrder
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "order-abc123"
+      responses:
+        '200':
+          description: Order gevonden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '404':
+          description: Order niet gevonden
+
+components:
+  schemas:
+    OrderResponse:
+      type: object
+      required: [orderId, amount, paymentStatus, approved]
+      properties:
+        orderId:
+          type: string
+          example: "order-abc123"
+        amount:
+          type: number
+          format: double
+          example: 49.95
+        paymentStatus:
+          type: string
+          enum: [APPROVED, REJECTED]
+          example: "APPROVED"
+        approved:
+          type: boolean
+          example: true

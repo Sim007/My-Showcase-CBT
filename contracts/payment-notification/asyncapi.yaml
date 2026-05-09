@@ -1,0 +1,54 @@
+asyncapi: "2.6.0"
+info:
+  title: Notification Service
+  description: Contract tussen Payment-service (publisher) en Notification-service (subscriber)
+  version: "1.0.0"
+
+servers:
+  rabbitmq:
+    url: amqp://localhost:5672
+    protocol: amqp
+
+channels:
+  payment.notifications:
+    description: Queue voor betaalnotificaties van Payment naar Notification
+    subscribe:
+      operationId: receivePaymentNotification
+      message:
+        $ref: '#/components/messages/PaymentNotification'
+    publish:
+      operationId: sendPaymentNotification
+      message:
+        $ref: '#/components/messages/PaymentNotification'
+
+components:
+  messages:
+    PaymentNotification:
+      name: PaymentNotification
+      title: Betaalnotificatie
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/PaymentNotificationPayload'
+
+  schemas:
+    PaymentNotificationPayload:
+      type: object
+      required: [notificationId, orderId, type, message, timestamp]
+      properties:
+        notificationId:
+          type: string
+          example: "notif-001"
+        orderId:
+          type: string
+          example: "order-123"
+        type:
+          type: string
+          enum: [PAYMENT_APPROVED, PAYMENT_REJECTED]
+          example: "PAYMENT_APPROVED"
+        message:
+          type: string
+          example: "Betaling voor order order-123 is goedgekeurd"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-05-08T10:00:00Z"

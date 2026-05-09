@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+    name="PaymentService"
+    targetNamespace="http://showcase.nl/payment/external"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="http://showcase.nl/payment/external"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://showcase.nl/payment/external">
+
+      <xsd:element name="AuthorizeRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="orderId" type="xsd:string"/>
+            <xsd:element name="amount" type="xsd:decimal"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="AuthorizeResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="transactionId" type="xsd:string"/>
+            <xsd:element name="approved" type="xsd:boolean"/>
+            <xsd:element name="reason" type="xsd:string" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+    </xsd:schema>
+  </wsdl:types>
+
+  <wsdl:message name="AuthorizeRequestMessage">
+    <wsdl:part name="parameters" element="tns:AuthorizeRequest"/>
+  </wsdl:message>
+
+  <wsdl:message name="AuthorizeResponseMessage">
+    <wsdl:part name="parameters" element="tns:AuthorizeResponse"/>
+  </wsdl:message>
+
+  <wsdl:portType name="PaymentPortType">
+    <wsdl:operation name="Authorize">
+      <wsdl:input message="tns:AuthorizeRequestMessage"/>
+      <wsdl:output message="tns:AuthorizeResponseMessage"/>
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="PaymentSoapBinding" type="tns:PaymentPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="Authorize">
+      <soap:operation soapAction="http://showcase.nl/payment/external/Authorize"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <wsdl:service name="PaymentService">
+    <wsdl:port name="PaymentPort" binding="tns:PaymentSoapBinding">
+      <soap:address location="http://localhost:8083/soap/payment"/>
+    </wsdl:port>
+  </wsdl:service>
+
+</wsdl:definitions>

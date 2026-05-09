@@ -1,0 +1,50 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Notificaties opzoeken</mat-card-title>
+    <mat-card-subtitle>GET /api/notifications</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <form [formGroup]="form" (ngSubmit)="search()">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Order ID</mat-label>
+        <input matInput formControlName="orderId"
+               data-testid="notif-order-id" placeholder="bijv. order-abc123" autocomplete="off" />
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit"
+              data-testid="search-notifications" [disabled]="isLoading || form.invalid">
+        {{ isLoading ? 'Zoeken...' : 'Zoek notificaties' }}
+      </button>
+    </form>
+  </mat-card-content>
+
+  @if (notifications.length > 0) {
+    <mat-card-content>
+      <mat-list data-testid="notifications-list">
+        @for (n of notifications; track n.notificationId) {
+          <mat-list-item data-testid="notification-item">
+            <span matListItemTitle>
+              <mat-chip [color]="n.type === 'PAYMENT_APPROVED' ? 'primary' : 'warn'" highlighted>
+                {{ n.type }}
+              </mat-chip>
+            </span>
+            <span matListItemLine>{{ n.message }}</span>
+            <span matListItemLine class="timestamp">{{ n.timestamp | date:'dd-MM-yyyy HH:mm:ss' }}</span>
+          </mat-list-item>
+        }
+      </mat-list>
+    </mat-card-content>
+  }
+
+  @if (searched && notifications.length === 0) {
+    <mat-card-content>
+      <p data-testid="no-notifications" class="info">Geen notificaties gevonden voor dit order.</p>
+    </mat-card-content>
+  }
+
+  @if (errorMessage) {
+    <mat-card-content>
+      <p data-testid="notif-error" class="error">{{ errorMessage }}</p>
+    </mat-card-content>
+  }
+</mat-card>

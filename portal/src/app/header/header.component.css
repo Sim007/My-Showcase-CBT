@@ -1,0 +1,20 @@
+.portal-title {
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+nav a {
+  margin-left: 4px;
+  opacity: 0.85;
+}
+
+nav a.active-link {
+  opacity: 1;
+  font-weight: 700;
+  border-bottom: 2px solid white;
+}

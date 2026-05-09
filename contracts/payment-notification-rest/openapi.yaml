@@ -1,0 +1,83 @@
+openapi: "3.0.3"
+info:
+  title: Notification REST API
+  description: >
+    Contract tussen Payment service (consumer) en Notification service (provider).
+    Payment roept dit endpoint aan voor directe REST-notificatie (Type 1).
+    Verschil met Type 2: dit is synchroon via REST, geen queue.
+  version: "1.0.0"
+
+servers:
+  - url: http://localhost:8082
+
+paths:
+  /api/notifications:
+    post:
+      summary: Maak een notificatie aan via directe REST-aanroep
+      operationId: createNotification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNotificationRequest'
+      responses:
+        '201':
+          description: Notificatie aangemaakt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationResponse'
+        '400':
+          description: Ongeldige invoer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    CreateNotificationRequest:
+      type: object
+      required: [orderId, type, message]
+      properties:
+        orderId:
+          type: string
+          example: "order-abc123"
+        type:
+          type: string
+          enum: [PAYMENT_APPROVED, PAYMENT_REJECTED]
+          example: "PAYMENT_APPROVED"
+        message:
+          type: string
+          example: "Betaling voor order order-abc123 is goedgekeurd"
+
+    NotificationResponse:
+      type: object
+      required: [notificationId, orderId, type, message, timestamp]
+      properties:
+        notificationId:
+          type: string
+          example: "notif-001"
+        orderId:
+          type: string
+          example: "order-abc123"
+        type:
+          type: string
+          enum: [PAYMENT_APPROVED, PAYMENT_REJECTED]
+          example: "PAYMENT_APPROVED"
+        message:
+          type: string
+          example: "Betaling voor order order-abc123 is goedgekeurd"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-05-08T10:00:00Z"
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string

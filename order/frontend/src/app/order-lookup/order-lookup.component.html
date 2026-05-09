@@ -1,0 +1,46 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Order opzoeken</mat-card-title>
+    <mat-card-subtitle>GET /api/orders/:id</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <form [formGroup]="form" (ngSubmit)="search()">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Order ID</mat-label>
+        <input matInput formControlName="orderId"
+               data-testid="lookup-order-id" placeholder="bijv. order-abc123" autocomplete="off" />
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit"
+              data-testid="search-order" [disabled]="isLoading || form.invalid">
+        {{ isLoading ? 'Zoeken...' : 'Zoek order' }}
+      </button>
+    </form>
+  </mat-card-content>
+
+  @if (result) {
+    <mat-card-content data-testid="order-detail" class="result">
+      <p><strong>Order ID:</strong> {{ result.orderId }}</p>
+      <p><strong>Bedrag:</strong> € {{ result.amount }}</p>
+      <p><strong>Status:</strong>
+        <span data-testid="order-detail-status"
+              [class.approved]="result.approved" [class.rejected]="!result.approved">
+          {{ result.paymentStatus }}
+        </span>
+      </p>
+    </mat-card-content>
+  }
+
+  @if (notFound) {
+    <mat-card-content><p data-testid="order-not-found" class="info">Order niet gevonden.</p></mat-card-content>
+  }
+
+  @if (errorMessage) {
+    <mat-card-content><p data-testid="order-lookup-error" class="error">{{ errorMessage }}</p></mat-card-content>
+  }
+
+  <mat-card-actions>
+    <a mat-button routerLink="..">← Order aanmaken</a>
+  </mat-card-actions>
+</mat-card>
+

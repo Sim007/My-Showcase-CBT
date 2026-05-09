@@ -1,0 +1,28 @@
+server:
+  port: 8081
+
+soap:
+  provider:
+    url: http://wiremock:8080/soap/payment
+
+notification:
+  service:
+    url: http://notification:8082
+
+spring:
+  application:
+    name: payment-service
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: guest
+    password: guest
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always

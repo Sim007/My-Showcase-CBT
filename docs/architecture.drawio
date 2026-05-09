@@ -1,0 +1,223 @@
+<mxGraphModel dx="1800" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <!-- ═══════════════════════════════
+         MICROFRONTEND LAAG (boven)
+    ═══════════════════════════════ -->
+
+    <!-- Portal Shell -->
+    <mxCell id="shell" value="Portal Shell&#xa;poort 4200  |  Angular + Material"
+      style="rounded=1;whiteSpace=wrap;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;fontStyle=1;arcSize=8;"
+      vertex="1" parent="1">
+      <mxGeometry x="460" y="40" width="280" height="80" as="geometry" />
+    </mxCell>
+
+    <!-- MF Order -->
+    <mxCell id="mf_order" value="mf-order&#xa;poort 4201  |  Module Federation"
+      style="rounded=1;whiteSpace=wrap;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;fontStyle=1;arcSize=8;"
+      vertex="1" parent="1">
+      <mxGeometry x="80" y="200" width="220" height="70" as="geometry" />
+    </mxCell>
+
+    <!-- MF Payments -->
+    <mxCell id="mf_payments" value="mf-payments&#xa;poort 4202  |  Module Federation"
+      style="rounded=1;whiteSpace=wrap;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;fontStyle=1;arcSize=8;"
+      vertex="1" parent="1">
+      <mxGeometry x="490" y="200" width="220" height="70" as="geometry" />
+    </mxCell>
+
+    <!-- MF Notifications -->
+    <mxCell id="mf_notifications" value="mf-notifications&#xa;poort 4203  |  Module Federation"
+      style="rounded=1;whiteSpace=wrap;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;fontStyle=1;arcSize=8;"
+      vertex="1" parent="1">
+      <mxGeometry x="900" y="200" width="240" height="70" as="geometry" />
+    </mxCell>
+
+    <!-- Shell → mf-order (loadRemoteModule) -->
+    <mxCell id="e_shell_order" value="loadRemoteModule"
+      style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#9673a6;fontColor=#9673a6;fontSize=10;fontStyle=1;labelBackgroundColor=#ffffff;
+             exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;"
+      edge="1" source="shell" target="mf_order" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="190" y="80" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- Shell → mf-payments (loadRemoteModule) -->
+    <mxCell id="e_shell_pay" value="loadRemoteModule"
+      style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#9673a6;fontColor=#9673a6;fontSize=10;fontStyle=1;labelBackgroundColor=#ffffff;
+             exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;"
+      edge="1" source="shell" target="mf_payments" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Shell → mf-notifications (loadRemoteModule) -->
+    <mxCell id="e_shell_notif" value="loadRemoteModule"
+      style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#9673a6;fontColor=#9673a6;fontSize=10;fontStyle=1;labelBackgroundColor=#ffffff;
+             exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;"
+      edge="1" source="shell" target="mf_notifications" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="1020" y="80" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ═══════════════════════════════
+         BACKEND SERVICES LAAG
+    ═══════════════════════════════ -->
+
+    <mxCell id="order" value="Order Service&#xa;poort 8080  |  Spring Boot"
+      style="rounded=1;whiteSpace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;fontStyle=1;arcSize=8;"
+      vertex="1" parent="1">
+      <mxGeometry x="80" y="430" width="220" height="80" as="geometry" />
+    </mxCell>
+
+    <mxCell id="payment" value="Payment Backend&#xa;poort 8081  |  Spring Boot"
+      style="rounded=1;whiteSpace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;fontStyle=1;arcSize=8;"
+      vertex="1" parent="1">
+      <mxGeometry x="490" y="430" width="240" height="80" as="geometry" />
+    </mxCell>
+
+    <mxCell id="notification" value="Notification Service&#xa;poort 8082  |  Spring Boot"
+      style="rounded=1;whiteSpace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;fontStyle=1;arcSize=8;"
+      vertex="1" parent="1">
+      <mxGeometry x="980" y="430" width="240" height="80" as="geometry" />
+    </mxCell>
+
+    <mxCell id="rabbitmq" value="RabbitMQ&#xa;poort 5672  |  Message Broker"
+      style="rounded=1;whiteSpace=wrap;fillColor=#ffe6cc;strokeColor=#d6b656;fontSize=13;fontStyle=1;arcSize=8;"
+      vertex="1" parent="1">
+      <mxGeometry x="490" y="660" width="240" height="80" as="geometry" />
+    </mxCell>
+
+    <mxCell id="wiremock" value="WireMock&#xa;poort 8083  |  SOAP mock"
+      style="rounded=1;whiteSpace=wrap;fillColor=#f8cecc;strokeColor=#b85450;fontSize=13;fontStyle=1;arcSize=8;"
+      vertex="1" parent="1">
+      <mxGeometry x="980" y="660" width="240" height="80" as="geometry" />
+    </mxCell>
+
+    <!-- ═══════════════════════════════
+         TYPE 0  MF → Backend (blauw gestippeld)
+    ═══════════════════════════════ -->
+
+    <!-- mf-order → Order -->
+    <mxCell id="e0_mford_ord" value="Type 0  |  POST + GET /api/orders"
+      style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#0066CC;fontColor=#0066CC;fontSize=10;fontStyle=1;labelBackgroundColor=#ffffff;
+             exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;"
+      edge="1" source="mf_order" target="order" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- mf-payments → Payment -->
+    <mxCell id="e0_mfpay_pay" value="Type 0  |  POST /api/payments"
+      style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#0066CC;fontColor=#0066CC;fontSize=10;fontStyle=1;labelBackgroundColor=#ffffff;
+             exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;"
+      edge="1" source="mf_payments" target="payment" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- mf-notifications → Notification -->
+    <mxCell id="e0_mfnotif_notif" value="Type 0  |  GET /api/notifications"
+      style="edgeStyle=orthogonalEdgeStyle;dashed=1;strokeColor=#0066CC;fontColor=#0066CC;fontSize=10;fontStyle=1;labelBackgroundColor=#ffffff;
+             exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;"
+      edge="1" source="mf_notifications" target="notification" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- ═══════════════════════════════
+         TYPE 1  groen  REST tussen deelsystemen
+    ═══════════════════════════════ -->
+
+    <!-- Order → Payment -->
+    <mxCell id="e1_ord_pay" value="Type 1  |  POST /api/payments (REST)"
+      style="edgeStyle=orthogonalEdgeStyle;strokeColor=#007700;fontColor=#007700;fontSize=11;fontStyle=1;labelBackgroundColor=#ffffff;
+             exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;"
+      edge="1" source="order" target="payment" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Payment → Notification REST -->
+    <mxCell id="e1_pay_notif" value="Type 1  |  POST /api/notifications (REST)"
+      style="edgeStyle=orthogonalEdgeStyle;strokeColor=#007700;fontColor=#007700;fontSize=11;fontStyle=1;labelBackgroundColor=#ffffff;
+             exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;"
+      edge="1" source="payment" target="notification" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- ═══════════════════════════════
+         TYPE 2  oranje  Async queue
+    ═══════════════════════════════ -->
+
+    <mxCell id="e2_pay_rabbit" value="Type 2  |  publish payment.notifications"
+      style="edgeStyle=orthogonalEdgeStyle;strokeColor=#CC6600;fontColor=#CC6600;fontSize=11;fontStyle=1;labelBackgroundColor=#ffffff;
+             exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;"
+      edge="1" source="payment" target="rabbitmq" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <mxCell id="e2_rabbit_notif" value="Type 2  |  subscribe payment.notifications"
+      style="edgeStyle=orthogonalEdgeStyle;strokeColor=#CC6600;fontColor=#CC6600;fontSize=11;fontStyle=1;labelBackgroundColor=#ffffff;
+             exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.7;entryDx=0;entryDy=0;"
+      edge="1" source="rabbitmq" target="notification" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="940" y="700" />
+          <mxPoint x="940" y="486" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ═══════════════════════════════
+         TYPE 3  rood  Extern SOAP
+    ═══════════════════════════════ -->
+
+    <mxCell id="e3_pay_wm" value="Type 3  |  SOAP POST /soap/payment"
+      style="edgeStyle=orthogonalEdgeStyle;strokeColor=#CC0000;fontColor=#CC0000;fontSize=11;fontStyle=1;labelBackgroundColor=#ffffff;
+             exitX=1;exitY=0.7;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;"
+      edge="1" source="payment" target="wiremock" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="870" y="486" />
+          <mxPoint x="870" y="580" />
+          <mxPoint x="960" y="580" />
+          <mxPoint x="960" y="700" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ═══════════════════════════════
+         LEGENDA
+    ═══════════════════════════════ -->
+
+    <mxCell id="leg_bg" value="" style="rounded=1;fillColor=#f5f5f5;strokeColor=#aaaaaa;" vertex="1" parent="1">
+      <mxGeometry x="80" y="800" width="1180" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="leg_mf" value="— — —  Module Federation (Shell → MF)"
+      style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontStyle=1;fontColor=#9673a6;"
+      vertex="1" parent="1"><mxGeometry x="95" y="813" width="250" height="25" as="geometry" /></mxCell>
+    <mxCell id="leg0" value="— — —  Type 0: MF → Backend"
+      style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontStyle=1;fontColor=#0066CC;"
+      vertex="1" parent="1"><mxGeometry x="355" y="813" width="190" height="25" as="geometry" /></mxCell>
+    <mxCell id="leg1" value="———  Type 1: REST"
+      style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontStyle=1;fontColor=#007700;"
+      vertex="1" parent="1"><mxGeometry x="555" y="813" width="140" height="25" as="geometry" /></mxCell>
+    <mxCell id="leg2" value="———  Type 2: Queue"
+      style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontStyle=1;fontColor=#CC6600;"
+      vertex="1" parent="1"><mxGeometry x="705" y="813" width="150" height="25" as="geometry" /></mxCell>
+    <mxCell id="leg3" value="———  Type 3: Extern SOAP"
+      style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontStyle=1;fontColor=#CC0000;"
+      vertex="1" parent="1"><mxGeometry x="865" y="813" width="200" height="25" as="geometry" /></mxCell>
+
+    <mxCell id="docker_label" value="Docker Compose netwerk"
+      style="text;html=1;strokeColor=#aaaaaa;fillColor=#f9f9f9;align=center;verticalAlign=middle;rounded=1;fontSize=11;fontColor=#555555;dashed=1;"
+      vertex="1" parent="1">
+      <mxGeometry x="80" y="868" width="1180" height="30" as="geometry" />
+    </mxCell>
+
+  </root>
+</mxGraphModel>

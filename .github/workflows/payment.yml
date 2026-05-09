@@ -1,0 +1,36 @@
+name: Payment Service – Build & Test
+
+on:
+  push:
+    paths:
+      - 'payment/backend/**'
+      - 'contracts/order-payment/**'
+      - 'contracts/payment-notification/**'
+      - 'contracts/payment-external/**'
+  pull_request:
+    paths:
+      - 'payment/backend/**'
+      - 'contracts/**'
+
+jobs:
+  build:
+    name: Build Payment service
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build en unit tests
+        working-directory: payment/backend
+        run: mvn verify
+
+      - name: Docker image bouwen
+        working-directory: payment/backend
+        run: docker build -t showcase/payment:${{ github.sha }} .

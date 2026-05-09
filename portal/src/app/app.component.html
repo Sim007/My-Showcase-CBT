@@ -1,0 +1,14 @@
+<app-header />
+
+<mat-progress-bar
+  *ngIf="isLoading"
+  mode="indeterminate"
+  color="accent"
+  class="nav-loader">
+</mat-progress-bar>
+
+<main class="content">
+  <router-outlet />
+</main>
+
+<app-footer />

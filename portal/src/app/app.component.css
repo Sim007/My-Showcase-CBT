@@ -1,0 +1,17 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main.content {
+  flex: 1;
+}
+
+.nav-loader {
+  position: fixed;
+  top: 64px;   /* hoogte van de MatToolbar */
+  left: 0;
+  right: 0;
+  z-index: 999;
+}

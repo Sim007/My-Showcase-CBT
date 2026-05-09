@@ -1,0 +1,5 @@
+mat-card { max-width: 560px; margin: 0 auto; }
+.full-width { width: 100%; margin-bottom: 16px; }
+.timestamp { font-size: 0.75rem; color: #888; }
+.info { color: #1565c0; }
+.error { color: #c62828; }
