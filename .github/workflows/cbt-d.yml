@@ -35,34 +35,13 @@ jobs:
           npm ci
           npx playwright install --with-deps chromium
 
-      - name: Type 0 – contract API tests (binnen deelsysteem)
+      - name: Contract tests (type 0–3)
         working-directory: CBT-D/tests
-        run: npx playwright test type0/ --grep "Contract"
+        run: npx playwright test --grep "Contract"
         env:
           ORDER_URL: http://localhost:8080
           PAYMENT_URL: http://localhost:8081
           NOTIFICATION_URL: http://localhost:8082
-          WIREMOCK_URL: http://localhost:8083
-
-      - name: Type 1 – tussen deelsystemen (Order → Payment REST)
-        working-directory: CBT-D/tests
-        run: npx playwright test type1/
-        env:
-          ORDER_URL: http://localhost:8080
-          PAYMENT_URL: http://localhost:8081
-
-      - name: Type 2 – queue (Payment → Notification)
-        working-directory: CBT-D/tests
-        run: npx playwright test type2/
-        env:
-          PAYMENT_URL: http://localhost:8081
-          NOTIFICATION_URL: http://localhost:8082
-
-      - name: Type 3 – extern SOAP (Payment → WireMock)
-        working-directory: CBT-D/tests
-        run: npx playwright test type3/
-        env:
-          PAYMENT_URL: http://localhost:8081
           WIREMOCK_URL: http://localhost:8083
 
       - name: Upload Playwright rapport
