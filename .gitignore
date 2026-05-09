@@ -24,6 +24,8 @@ dist/
 # Playwright
 tests/playwright-report/
 tests/test-results/
+test-results/
+playwright-report/
 
 # IntelliJ / JetBrains
 .idea/
