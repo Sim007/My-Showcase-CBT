@@ -1,0 +1,3 @@
+{
+  "playwright.configFile": "CBT-D/tests/playwright.config.ts"
+}
