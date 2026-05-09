@@ -28,7 +28,12 @@ for port in "${PORTS[@]}"; do
   if [ -n "$PIDS" ]; then
     for pid in $PIDS; do
       CMD=$(ps -p "$pid" -o comm= 2>/dev/null || echo "onbekend")
-      kill "$pid" 2>/dev/null && warn "Poort $port vrijgemaakt — $CMD (PID $pid) gestopt"
+      case "$CMD" in
+        *docker*|*Docker*|*vpnkit*|*com.docker*)
+          warn "Poort $port in gebruik door Docker ($CMD) — overgeslagen" ;;
+        *)
+          kill "$pid" 2>/dev/null && warn "Poort $port vrijgemaakt — $CMD (PID $pid) gestopt" ;;
+      esac
     done
   fi
 done
