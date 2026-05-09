@@ -10,7 +10,7 @@ const PAYMENT_URL      = process.env.PAYMENT_URL      ?? 'http://localhost:8081'
 const NOTIFICATION_URL = process.env.NOTIFICATION_URL ?? 'http://localhost:8082';
 
 const asyncApiDoc = yaml.load(
-  fs.readFileSync(path.join(__dirname, '../../contracts/payment-notification/asyncapi.yaml'), 'utf8')
+  fs.readFileSync(path.join(__dirname, '../../../contracts/payment-notification/asyncapi.yaml'), 'utf8')
 ) as any;
 
 const payloadSchema = asyncApiDoc.components.schemas.PaymentNotificationPayload;

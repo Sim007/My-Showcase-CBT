@@ -12,7 +12,7 @@ const PAYMENT_URL      = process.env.PAYMENT_URL      ?? 'http://localhost:8081'
 const NOTIFICATION_URL = process.env.NOTIFICATION_URL ?? 'http://localhost:8082';
 
 const doc = yaml.load(
-  fs.readFileSync(path.join(__dirname, '../../contracts/notification-lookup/openapi.yaml'), 'utf8')
+  fs.readFileSync(path.join(__dirname, '../../../contracts/notification-lookup/openapi.yaml'), 'utf8')
 ) as any;
 
 const ajv = new Ajv({ strict: false });

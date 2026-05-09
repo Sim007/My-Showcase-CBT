@@ -11,7 +11,7 @@ import * as yaml from 'js-yaml';
 const PAYMENT_URL = process.env.PAYMENT_URL ?? 'http://localhost:8081';
 
 const doc = yaml.load(
-  fs.readFileSync(path.join(__dirname, '../../contracts/order-payment/openapi.yaml'), 'utf8')
+  fs.readFileSync(path.join(__dirname, '../../../contracts/order-payment/openapi.yaml'), 'utf8')
 ) as any;
 
 const ajv = new Ajv({ strict: false });

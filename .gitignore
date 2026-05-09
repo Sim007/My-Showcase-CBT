@@ -22,8 +22,8 @@ dist/
 .angular/
 
 # Playwright
-tests/playwright-report/
-tests/test-results/
+CBT-D/tests/playwright-report/
+CBT-D/tests/test-results/
 test-results/
 playwright-report/
 

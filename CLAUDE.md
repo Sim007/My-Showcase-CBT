@@ -14,21 +14,21 @@ Bij elke wijziging in dit project moeten **alle onderstaande afhankelijkheden** 
 - [ ] Angular component in de juiste MF (`payment/mf-order/`, `payment/mf-payments/`, `payment/mf-notifications/`)
 - [ ] Route toegevoegd in de MF's `app.routes.ts`
 - [ ] Shell proxy bijgewerkt: `payment/shell/proxy.conf.json` en `nginx.conf`
-- [ ] Playwright contract-spec in `tests/type0/*-contract.spec.ts`
-- [ ] Playwright UI-spec in `tests/type0/*.spec.ts` (navigatie via routes, niet tabs)
+- [ ] Playwright contract-spec in `CBT-D/tests/type0/*-contract.spec.ts`
+- [ ] Playwright UI-spec in `CBT-D/tests/type0/*.spec.ts` (navigatie via routes, niet tabs)
 - [ ] `README.md` — type-tabel, projectstructuur, contractenlijst
 - [ ] `CBT-D/start.sh` — `wait_for` voor nieuwe health endpoint
 - [ ] `CBT-D/sts.sh` — env vars en `wait_for`
 - [ ] `.github/workflows/contract-tests.yml` — env vars en teststap
 
 ### Contract gewijzigd (`contracts/`)
-- [ ] Bijbehorende Playwright contract-spec (`tests/type0/*-contract.spec.ts`)
+- [ ] Bijbehorende Playwright contract-spec (`CBT-D/tests/type0/*-contract.spec.ts`)
 - [ ] Bijbehorende service-code die het contract implementeert
 - [ ] `README.md` — contractentabel
 
-### Test type of mapnaam veranderd (`tests/type*`)
-- [ ] `tests/playwright.config.ts` — projecten bijwerken
-- [ ] `tests/package.json` — scripts bijwerken
+### Test type of mapnaam veranderd (`CBT-D/tests/type*`)
+- [ ] `CBT-D/tests/playwright.config.ts` — projecten bijwerken
+- [ ] `CBT-D/tests/package.json` — scripts bijwerken
 - [ ] `.github/workflows/contract-tests.yml` — stap hernoemen + env vars
 - [ ] `README.md` — testcommando's bijwerken
 - [ ] `CBT-D/start.sh` — instructietekst
@@ -63,10 +63,10 @@ Bij elke wijziging in dit project moeten **alle onderstaande afhankelijkheden** 
 
 | Type | Beschrijving               | Tests                  | Contracts                        |
 |------|----------------------------|------------------------|----------------------------------|
-| 0    | UI → Backend               | `tests/type0/`         | 4× `contracts/*/openapi.yaml`    |
-| 1    | Tussen deelsystemen (REST) | `tests/type1/`         | `contracts/order-payment/`       |
-| 2    | Async queue                | `tests/type2/`         | `contracts/payment-notification/`|
-| 3    | Extern SOAP                | `tests/type3/`         | `contracts/payment-external/`    |
+| 0    | UI → Backend               | `CBT-D/tests/type0/`   | 4× `contracts/*/openapi.yaml`    |
+| 1    | Tussen deelsystemen (REST) | `CBT-D/tests/type1/`   | `contracts/order-payment/`       |
+| 2    | Async queue                | `CBT-D/tests/type2/`   | `contracts/payment-notification/`|
+| 3    | Extern SOAP                | `CBT-D/tests/type3/`   | `contracts/payment-external/`    |
 
 ## Poorten
 
@@ -97,9 +97,9 @@ Shell routes: `/payments` → mf-payments, `/orders` → mf-order, `/notificatio
 
 | Contract                                    | Test                                          |
 |---------------------------------------------|-----------------------------------------------|
-| `contracts/order-payment/openapi.yaml`      | `tests/type0/payment-contract.spec.ts`        |
-| `contracts/order-create/openapi.yaml`       | `tests/type0/order-create-contract.spec.ts`   |
-| `contracts/order-lookup/openapi.yaml`       | `tests/type0/order-lookup-contract.spec.ts`   |
-| `contracts/notification-lookup/openapi.yaml`| `tests/type0/notification-contract.spec.ts`   |
-| `contracts/payment-notification/asyncapi.yaml` | `tests/type2/payment-notification.spec.ts` |
-| `contracts/payment-external/payment.wsdl`  | `tests/type3/payment-soap.spec.ts`            |
+| `contracts/order-payment/openapi.yaml`      | `CBT-D/tests/type0/payment-contract.spec.ts`        |
+| `contracts/order-create/openapi.yaml`       | `CBT-D/tests/type0/order-create-contract.spec.ts`   |
+| `contracts/order-lookup/openapi.yaml`       | `CBT-D/tests/type0/order-lookup-contract.spec.ts`   |
+| `contracts/notification-lookup/openapi.yaml`| `CBT-D/tests/type0/notification-contract.spec.ts`   |
+| `contracts/payment-notification/asyncapi.yaml` | `CBT-D/tests/type2/payment-notification.spec.ts` |
+| `contracts/payment-external/payment.wsdl`  | `CBT-D/tests/type3/payment-soap.spec.ts`            |

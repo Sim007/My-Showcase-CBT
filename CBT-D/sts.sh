@@ -2,7 +2,6 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$ROOT/.." && pwd)"
 
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -45,7 +44,7 @@ done
 # 3. Playwright browsers installeren
 # ---------------------------------------------------------------------------
 log "Playwright browsers installeren..."
-cd "$PROJECT_ROOT"
+cd "$ROOT/tests"
 npx playwright install chromium --with-deps 2>/dev/null || npx playwright install chromium
 
 # ---------------------------------------------------------------------------
@@ -84,7 +83,7 @@ wait_for "Portal shell"      "http://localhost:4200"
 # 6. Playwright tests draaien
 # ---------------------------------------------------------------------------
 log "Tests draaien..."
-cd "$PROJECT_ROOT"
+cd "$ROOT/tests"
 
 export ORDER_URL="http://localhost:8080"
 export PAYMENT_URL="http://localhost:8081"
@@ -97,7 +96,7 @@ npx playwright test || EXIT_CODE=$?
 if [ "$EXIT_CODE" -eq 0 ]; then
   log "Alle tests geslaagd."
 else
-  warn "Er zijn testfouten. Bekijk het rapport: playwright-report/index.html"
+  warn "Er zijn testfouten. Bekijk het rapport: CBT-D/tests/playwright-report/index.html"
 fi
 
 exit "$EXIT_CODE"

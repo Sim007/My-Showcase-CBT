@@ -67,5 +67,5 @@ wait_for "Portal shell"      "http://localhost:4200"
 
 log "Alle services draaien. Gebruik './stop.sh' om alles te stoppen."
 log ""
-log "Tests starten (vanuit projectroot):"
-log "  npx playwright test"
+log "Tests starten:"
+log "  cd CBT-D/tests && npx playwright test"

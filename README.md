@@ -54,18 +54,18 @@ Bedoeld voor een tribe met 10 feature squads + 1 platform squad.
 │   ├── backend/              # Spring Boot service (poort 8082)
 │   └── frontend/             # mf-notifications – Angular MF (poort 4203)
 ├── portal/                   # Platform squad – Angular shell (poort 4200)
-├── CBT-D/                    # Docker deployment context
+├── CBT-D/                    # Docker deployment context (volledig)
 │   ├── docker-compose.yml
 │   ├── docker-compose.ci.yml
 │   ├── wiremock/mappings/                  # SOAP mock responses
 │   ├── start.sh              # Start alle services via Docker Compose
 │   ├── stop.sh               # Stop alle Docker services
-│   └── sts.sh                # Start → Test → Stop in één keer
-├── tests/
-│   ├── type0/   # UI + contract API tests (Angular → Backend)
-│   ├── type1/   # REST tussen deelsystemen (Order → Payment)
-│   ├── type2/   # Queue tests (Payment → Notification)
-│   └── type3/   # SOAP tests (Payment → WireMock)
+│   ├── sts.sh                # Start → Test → Stop in één keer
+│   └── tests/
+│       ├── type0/   # UI + contract API tests (Angular → Backend)
+│       ├── type1/   # REST tussen deelsystemen (Order → Payment)
+│       ├── type2/   # Queue tests (Payment → Notification)
+│       └── type3/   # SOAP tests (Payment → WireMock)
 └── .github/workflows/                      # CI pipelines
 ```
 
@@ -89,16 +89,16 @@ Bedoeld voor een tribe met 10 feature squads + 1 platform squad.
 
 ```bash
 cd CBT-D
-./start.sh          # bouwt en start alles in Docker, wacht tot alle services gezond zijn
+./start.sh                              # bouwt en start alles in Docker
 
-cd ..
-npx playwright test            # alle types
-npm run test:type0             # alleen UI tests (Angular → Backend)
-npm run test:type1             # alleen REST tussen deelsystemen (Order → Payment)
-npm run test:type2             # alleen queue tests (Payment → Notification)
-npm run test:type3             # alleen SOAP tests (Payment → WireMock)
+cd tests
+npx playwright test                     # alle types
+npx playwright test type0/              # alleen UI tests (Angular → Backend)
+npx playwright test type1/              # alleen REST tussen deelsystemen
+npx playwright test type2/              # alleen queue tests
+npx playwright test type3/              # alleen SOAP tests
 
-cd CBT-D && ./stop.sh           # stopt alles netjes af
+cd .. && ./stop.sh                      # stopt alles netjes af
 ```
 
 #### Volledig geautomatiseerd (start + test + stop)
@@ -123,7 +123,7 @@ export NOTIFICATION_URL=http://localhost:8082
 export WIREMOCK_URL=http://localhost:8083
 ```
 
-> `CBT-D/start.sh` toont deze commando's automatisch na het opstarten.
+> `CBT-D/start.sh` toont het testcommando automatisch na het opstarten.
 
 ## WireMock SOAP-gedrag
 

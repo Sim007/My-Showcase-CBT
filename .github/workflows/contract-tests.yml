@@ -42,13 +42,13 @@ jobs:
             --timeout 120000
 
       - name: Installeer Playwright
-        working-directory: tests
+        working-directory: CBT-D/tests
         run: |
           npm ci
           npx playwright install --with-deps chromium
 
       - name: Type 0 – contract API tests (binnen deelsysteem)
-        working-directory: tests
+        working-directory: CBT-D/tests
         run: npx playwright test type0/ --grep "Contract"
         env:
           ORDER_URL: http://localhost:8080
@@ -57,21 +57,21 @@ jobs:
           WIREMOCK_URL: http://localhost:8083
 
       - name: Type 1 – tussen deelsystemen (Order → Payment REST)
-        working-directory: tests
+        working-directory: CBT-D/tests
         run: npx playwright test type1/
         env:
           ORDER_URL: http://localhost:8080
           PAYMENT_URL: http://localhost:8081
 
       - name: Type 2 – queue (Payment → Notification)
-        working-directory: tests
+        working-directory: CBT-D/tests
         run: npx playwright test type2/
         env:
           PAYMENT_URL: http://localhost:8081
           NOTIFICATION_URL: http://localhost:8082
 
       - name: Type 3 – extern SOAP (Payment → WireMock)
-        working-directory: tests
+        working-directory: CBT-D/tests
         run: npx playwright test type3/
         env:
           PAYMENT_URL: http://localhost:8081
@@ -82,7 +82,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
-          path: tests/playwright-report/
+          path: CBT-D/tests/playwright-report/
 
       - name: Stop services
         if: always()

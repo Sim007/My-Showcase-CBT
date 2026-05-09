@@ -11,7 +11,7 @@ import * as yaml from 'js-yaml';
 const ORDER_URL = process.env.ORDER_URL ?? 'http://localhost:8080';
 
 const doc = yaml.load(
-  fs.readFileSync(path.join(__dirname, '../../contracts/order-create/openapi.yaml'), 'utf8')
+  fs.readFileSync(path.join(__dirname, '../../../contracts/order-create/openapi.yaml'), 'utf8')
 ) as any;
 
 const ajv = new Ajv({ strict: false });
