@@ -1,10 +1,7 @@
 name: CBT-D – Contract Tests
 
 on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main]
+  workflow_dispatch:
 
 jobs:
   contract-tests:
