@@ -11,7 +11,7 @@ Bouwopdracht en volgorde: zie `claude-code.prompt.md` (de actuele versie). Bij s
 - **Grens = interface tussen deelsystemen.** Frontend → eigen backend is deelsysteem-intern: de containergrens is niet de contractgrens.
 - **Vol regime alleen op echte grenzen** (diff-gate, pins, verificatie beide kanten, healthcheck-deelname): `order-payment`, `payment-notification` (async), `payment-external`. Interne contracten (`order-create`, `order-lookup`, `notification-lookup`) worden spec-gedreven getest maar zonder gate-regime — ze demonstreren squad-autonomie.
 - **SemVer met betekenis:** pins expliciet in Git, nooit "latest" in een gate. Contractversies in versie-directories: `contracts/<grens>/<versie>/…`.
-- **Alleen OSS:** oasdiff, swagger-request-validator (mockmvc + wiremock), springdoc, networknt json-schema-validator, Spring-WS PayloadValidatingInterceptor, WireMock, Playwright + ajv, Actuator. Géén Pact, géén Specmatic, géén Spring Cloud Contract.
+- **Alleen OSS:** oasdiff, swagger-request-validator (core + wiremock-junit5 — niet de met Boot 3.5 incompatibele -mockmvc-adapter, zie "Contractverificatie-tooling"), springdoc, networknt json-schema-validator, Spring-WS PayloadValidatingInterceptor, WireMock, Playwright + ajv, Actuator. Géén Pact, géén Specmatic, géén Spring Cloud Contract.
 - **Vaste verificatievolgorde per pipeline:** diff-gate (op spec-wijziging) → contractverificatie provider-/consumerkant → compose up → deployment-healthcheck (compositie: pinned vs served, beide richtingen) → keten-smoke (één happy path per grens over de echte stack) → Playwright-scenario's. Latere lagen herhalen nooit wat eerdere lagen bewezen.
 - **Zelfverklaring overal:** elk deelsysteem exposeert serves/consumes-contractversies via `/actuator/info` én als OCI-labels, gevuld vanuit de build — nooit hardcoded gedupliceerd.
 - **Dunste oplossing die het demo-scenario bewijst.** Dit is een showcase, geen productplatform.
@@ -43,9 +43,49 @@ In deze repo is dat omgedraaid — bewuste beslissing, vastgelegd tijdens het pl
   dependencies (nog geen WireMock-stub — die volgt in onderdeel 2 zonder dit mechanisme te
   wijzigen). Profiel `local` (gebruikt door `start.sh`/`sts.sh`) start alles.
 - **`ci/diff-gate.sh` is al functioneel** (niet als placeholder gebouwd) — bewijst demo-scenario 1
-  end-to-end. `contract-verify.sh`, `healthcheck.sh`, `smoke.sh` zijn nog placeholders die het
-  uniforme outputformaat tonen (`NOT-IMPLEMENTED (onderdeel N)`); logica volgt in de onderdelen
-  2-4, 6 en 7.
+  end-to-end. `ci/contract-verify.sh` is functioneel voor `--contract order-payment` (onderdeel 2,
+  beide `--side`-waarden); voor overige contracten blijft het `NOT-IMPLEMENTED` (volgt in de
+  onderdelen 3-4). `healthcheck.sh`/`smoke.sh` zijn nog placeholders (onderdelen 6, 7).
+
+## Contractverificatie-tooling (bevindingen uit onderdeel 2 — niet gokken, altijd verifiëren)
+
+Vóór het bouwen van `ci/contract-verify.sh` is de daadwerkelijke Atlassian-repo nagetrokken
+(WebSearch/WebFetch/`gh api`, niet uit trainingskennis aangenomen). Twee harde compatibiliteitsgaten
+gevonden die bij een volgend contract (onderdelen 3-4) weer kunnen opduiken:
+
+- **`swagger-request-validator-mockmvc` (élke versie) is incompatibel met Spring Boot 3.5/Jakarta.**
+  De laatste 2.x-release (`2.44.9`) is nog `javax.servlet`/Spring 5.3/Boot 2.6; de opvolger
+  (`openapi-request-validator-mockmvc` v3+) vereist Spring 7+/Boot 4+. Gebruik in plaats daarvan
+  **`com.atlassian.oai:swagger-request-validator-core:2.44.9`** rechtstreeks (framework-agnostisch:
+  `SimpleRequest`/`SimpleResponse`/`OpenApiInteractionValidator`, geen servlet-dependency) tegen een
+  `@SpringBootTest(webEnvironment=RANDOM_PORT)` + `TestRestTemplate`. Zie
+  `payment/backend/src/test/kotlin/nl/showcase/payment/PaymentProviderContractTest.kt`.
+- **`swagger-request-validator-wiremock-junit5:2.44.9` trekt `com.github.tomakehurst:wiremock-jre8`
+  (WireMock 2.x) binnen, waarvan de transitieve Jetty-jars door Spring Boot's BOM naar Jetty 12
+  worden opgetrokken terwijl `wiremock-jre8` zelf op Jetty 9.4 leunt — `NoClassDefFoundError`.**
+  Fix: exclude `wiremock-jre8` en gebruik in plaats daarvan de **shaded**
+  `com.github.tomakehurst:wiremock-jre8-standalone:2.35.2` (relocate't zijn eigen Jetty-klassen,
+  geen conflict). Vereist ook `javax.servlet:javax.servlet-api` (test-scope, alleen voor Jetty's
+  eigen classloading — geen overlap met de Jakarta-servlet-stack van de app). De feitelijke
+  WireMock-extensieklasse in 2.44.9 heet `com.atlassian.oai.validator.wiremock.junit5.OpenApiValidator`
+  (niet `OpenApiValidationListener` — dat is de nieuwere, incompatibele v3-API), en
+  `assertValidationPassed()` gooit `OpenApiValidationException`, geen `AssertionError`.
+  `PostServeAction`-validatie draait **asynchroon** ná het versturen van de respons — een korte
+  wachttijd is nodig vóór het rapport wordt uitgelezen (zie de test voor het patroon).
+- **springdoc 2.8.6 op JDK 21 crasht op `/v3/api-docs` (élk formaat, niet alleen `.yaml`)** met
+  `NoClassDefFoundError: javax/xml/bind/annotation/XmlElement` — `swagger-core` verwijst
+  onvoorwaardelijk naar die JAXB-klasse, die sinds Java 11 niet meer bij de JDK zit. Fix:
+  `javax.xml.bind:jaxb-api:2.3.1` als dependency (zuivere JDK-gat-dichter, geen contract-testing-tool
+  op zich — vergelijkbaar met `javax.servlet-api` hierboven). Ook `springdoc.api-docs.version:
+  OPENAPI_3_0` gezet zodat de gegenereerde spec dezelfde OAS-major/minor is als de gepubliceerde
+  contracten (3.0.x).
+- **springdoc-drift-check vereist volledige OpenAPI-annotatie** van elke provider-controller
+  (`@Operation`, `@ApiResponses` met expliciet schema — anders gaat responstype-info verloren via
+  `ResponseEntity<Any>` — en `@Schema(example=..., minimum=...)` op DTO-velden) plus een
+  `OpenAPI`-bean met `info`/`servers` die exact het gepubliceerde contract spiegelt (springdoc
+  gebruikt anders de random test-poort als server-URL en een generieke titel/versie). Zie
+  `payment/backend/src/main/kotlin/nl/showcase/payment/config/OpenApiConfig.kt` en de annotaties in
+  `PaymentController.kt`.
 
 ## Terminologie
 

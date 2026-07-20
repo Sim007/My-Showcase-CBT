@@ -61,6 +61,35 @@
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!-- Onderdeel 2, providerkant: swagger-request-validator-core (NIET de -mockmvc-adapter —
+         die is op elke gepubliceerde versie incompatibel met Spring Boot 3.x/Jakarta; zie
+         CLAUDE.md voor de onderbouwing). Core is framework-agnostisch: SimpleRequest/
+         SimpleResponse + OpenApiInteractionValidator, geen servlet-afhankelijkheid. -->
+    <dependency>
+      <groupId>com.atlassian.oai</groupId>
+      <artifactId>swagger-request-validator-core</artifactId>
+      <version>2.44.9</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Onderdeel 2, springdoc-drift-check: genereert de live OpenAPI-spec (/v3/api-docs) uit de
+         controllers, vergeleken met de gepinde spec via oasdiff in ci/contract-verify.sh. -->
+    <dependency>
+      <groupId>org.springdoc</groupId>
+      <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+      <version>2.8.6</version>
+    </dependency>
+    <!-- swagger-core (springdoc-transitief) verwijst onvoorwaardelijk naar
+         javax.xml.bind.annotation.XmlElement in zijn schema-introspectie — een JDK-module die
+         sinds Java 11 niet meer bij de JDK zit. Zonder deze dependency crasht /v3/api-docs met
+         NoClassDefFoundError. Zuivere glue-dependency om een JDK-gat te dichten, geen
+         contract-testing-tool op zich. -->
+    <dependency>
+      <groupId>javax.xml.bind</groupId>
+      <artifactId>jaxb-api</artifactId>
+      <version>2.3.1</version>
+    </dependency>
   </dependencies>
 
   <build>

@@ -1,4 +1,4 @@
-openapi: "3.0.3"
+openapi: "3.0.1"
 info:
   title: Payment API
   description: Contract tussen Order-service (consumer) en Payment-service (provider)
@@ -12,6 +12,7 @@ paths:
     post:
       summary: Verwerk een betaling voor een order
       operationId: processPayment
+      tags: [payment-controller]
       requestBody:
         required: true
         content:
@@ -67,6 +68,7 @@ components:
 
     ErrorResponse:
       type: object
+      required: [error, message]
       properties:
         error:
           type: string

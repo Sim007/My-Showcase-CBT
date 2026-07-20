@@ -56,6 +56,36 @@
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!-- Onderdeel 2, consumerkant: WireMock-stub voor Payment + OpenApiValidationListener,
+         valideert elk verzoek dat Order stuurt tegen contracts/order-payment/1.0.0/openapi.yaml.
+         Trekt wiremock-jre8 mee — een volledig losstaande embedded stub-server, geen
+         servlet-afhankelijkheid, dus geen conflict met Boot 3.5/Jakarta (zie CLAUDE.md) en geen
+         versiebotsing met de Docker-WireMock 3.x die voor de SOAP-grens draait (gescheiden
+         classpaths). -->
+    <dependency>
+      <groupId>com.atlassian.oai</groupId>
+      <artifactId>swagger-request-validator-wiremock-junit5</artifactId>
+      <version>2.44.9</version>
+      <scope>test</scope>
+      <exclusions>
+        <!-- De losse wiremock-jre8-jar trekt zijn Jetty-dependencies transitief binnen, en
+             Spring Boot's BOM overschrijft een deel daarvan (jetty-server/-http/-io/-util/...)
+             naar Jetty 12 (Jakarta) terwijl wiremock-jre8 zelf op Jetty 9.4 (javax) leunt —
+             gemengde versies crashen met NoClassDefFoundError. De standalone/shaded variant
+             hieronder relocate't zijn eigen Jetty-klassen en ontwijkt dit volledig. -->
+        <exclusion>
+          <groupId>com.github.tomakehurst</groupId>
+          <artifactId>wiremock-jre8</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.github.tomakehurst</groupId>
+      <artifactId>wiremock-jre8-standalone</artifactId>
+      <version>2.35.2</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
