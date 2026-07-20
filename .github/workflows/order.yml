@@ -61,10 +61,11 @@ jobs:
         run: |
           npm ci
           npx playwright install --with-deps chromium
-          npx playwright test intern/order-lookup-contract.spec.ts intern/order-create-contract.spec.ts rest/order-payment.spec.ts
+          npx playwright test intern/order-lookup-contract.spec.ts intern/order-create-contract.spec.ts rest/order-payment.spec.ts chain/order-to-notification.spec.ts
         env:
           ORDER_URL: http://localhost:8080
           PAYMENT_URL: http://localhost:8081
+          NOTIFICATION_URL: http://localhost:8082
 
       - name: Upload Playwright rapport
         if: always()

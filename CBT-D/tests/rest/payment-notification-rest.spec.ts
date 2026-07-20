@@ -1,26 +1,13 @@
 import { test, expect } from '@playwright/test';
-import Ajv from 'ajv';
-import addFormats from 'ajv-formats';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as yaml from 'js-yaml';
+import { assertMatchesSchema, getSchema } from '../fixtures/ajv-schema';
 
 // Type 1: Tussen deelsystemen — Payment service (consumer) → Notification service (provider) via REST
 // Contract: contracts/payment-notification-rest/1.0.0/openapi.yaml
 
 const PAYMENT_URL      = process.env.PAYMENT_URL      ?? 'http://localhost:8081';
 const NOTIFICATION_URL = process.env.NOTIFICATION_URL ?? 'http://localhost:8082';
-
-const doc = yaml.load(
-  fs.readFileSync(path.join(__dirname, '../../../contracts/payment-notification-rest/1.0.0/openapi.yaml'), 'utf8')
-) as any;
-
-const ajv = new Ajv({ strict: false });
-addFormats(ajv);
-const validateRequest  = ajv.compile(doc.components.schemas.CreateNotificationRequest);
-const validateResponse = ajv.compile(doc.components.schemas.NotificationResponse);
-const validateError    = ajv.compile(doc.components.schemas.ErrorResponse);
-const allowedTypes     = doc.components.schemas.CreateNotificationRequest.properties.type.enum as string[];
+const CONTRACT = 'payment-notification-rest/1.0.0/openapi.yaml';
+const allowedTypes = getSchema(CONTRACT, 'CreateNotificationRequest').properties.type.enum as string[];
 
 test.describe('Type 1 – Contract: Payment→Notification (REST POST /api/notifications)', () => {
 
@@ -48,15 +35,13 @@ test.describe('Type 1 – Contract: Payment→Notification (REST POST /api/notif
       message: 'Directe REST notificatie'
     };
 
-    expect(validateRequest(body)).toBe(true);
+    assertMatchesSchema(CONTRACT, 'CreateNotificationRequest', body);
 
     const res = await request.post(`${NOTIFICATION_URL}/api/notifications`, { data: body });
     expect(res.status()).toBe(201);
 
     const json = await res.json();
-    const valid = validateResponse(json);
-    if (!valid) console.error(validateResponse.errors);
-    expect(valid).toBe(true);
+    assertMatchesSchema(CONTRACT, 'NotificationResponse', json);
 
     expect(json.orderId).toBe(body.orderId);
     expect(json.notificationId).toBeTruthy();
@@ -72,7 +57,7 @@ test.describe('Type 1 – Contract: Payment→Notification (REST POST /api/notif
       data: { orderId: 'order-x', type: 'ONGELDIG_TYPE', message: 'test' }
     });
     expect(res.status()).toBe(400);
-    expect(validateError(await res.json())).toBe(true);
+    assertMatchesSchema(CONTRACT, 'ErrorResponse', await res.json());
   });
 
   test('leeg orderId retourneert 400 met ErrorResponse', async ({ request }) => {
@@ -80,6 +65,6 @@ test.describe('Type 1 – Contract: Payment→Notification (REST POST /api/notif
       data: { orderId: '', type: 'PAYMENT_APPROVED', message: 'test' }
     });
     expect(res.status()).toBe(400);
-    expect(validateError(await res.json())).toBe(true);
+    assertMatchesSchema(CONTRACT, 'ErrorResponse', await res.json());
   });
 });

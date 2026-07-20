@@ -154,8 +154,21 @@ compose-up, dus vóór er een broker draait.
 | `CBT-D/tests/rest/`    | type 2 sync: Order → Payment  | `contracts/order-payment/`                     |
 | `CBT-D/tests/async/`   | type 2 async: Payment → Notif.| `contracts/payment-notification/` (AsyncAPI)   |
 | `CBT-D/tests/soap/`    | type 3: Payment → buiten de tribe | `contracts/payment-external/`              |
+| `CBT-D/tests/chain/`   | cross-cutting — geen eigen type | `order-payment` + `payment-notification` (semantische keten, geen schemaherhaling) |
 
 `payment-notification-rest` is een tweede type-2-sync-grens; pas oppakken ná de drie primaire grenzen.
+
+## Playwright-conventie (onderdeel 5)
+
+Response-validatie loopt via één herbruikbare fixture, `CBT-D/tests/fixtures/ajv-schema.ts`:
+`assertMatchesSchema(contractFile, schemaName, data)` en `getSchema(contractFile, schemaName)`.
+Beide OpenAPI en AsyncAPI gebruiken hier dezelfde `components.schemas.<Naam>`-structuur, dus één
+generieke helper volstaat voor alle contracten (geen aparte OpenAPI-/AsyncAPI-variant nodig).
+**Nieuwe scenario's toevoegen: schrijf een test die de fixture aanroept, raak
+`fixtures/ajv-schema.ts` zelf niet aan** tenzij de contractvorm (bv. `components.schemas`-pad)
+verandert. `CBT-D/tests/chain/order-to-notification.spec.ts` is de enige, dunne semantische
+ketentest — herhaalt geen scenario's uit `intern/`/`rest/`/`async/`/`soap/`, bewijst alleen de
+zakelijke uitkomst van de volledige keten.
 
 ## Altijd meteen aanpassen
 

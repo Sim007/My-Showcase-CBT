@@ -1,20 +1,13 @@
 import { test, expect } from '@playwright/test';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as yaml from 'js-yaml';
+import { assertMatchesSchema, getSchema } from '../fixtures/ajv-schema';
 
 // Type 2: Queue — Payment service publiceert naar RabbitMQ, Notification service ontvangt
 // Contract: contracts/payment-notification/1.0.0/asyncapi.yaml
 
 const PAYMENT_URL      = process.env.PAYMENT_URL      ?? 'http://localhost:8081';
 const NOTIFICATION_URL = process.env.NOTIFICATION_URL ?? 'http://localhost:8082';
-
-const asyncApiDoc = yaml.load(
-  fs.readFileSync(path.join(__dirname, '../../../contracts/payment-notification/1.0.0/asyncapi.yaml'), 'utf8')
-) as any;
-
-const payloadSchema = asyncApiDoc.components.schemas.PaymentNotificationPayload;
-const allowedTypes  = payloadSchema.properties.type.enum as string[];
+const CONTRACT = 'payment-notification/1.0.0/asyncapi.yaml';
+const allowedTypes = getSchema(CONTRACT, 'PaymentNotificationPayload').properties.type.enum as string[];
 
 test.describe('Type 2 – Contract: Payment→Notification (Queue/RabbitMQ)', () => {
 
@@ -36,13 +29,10 @@ test.describe('Type 2 – Contract: Payment→Notification (Queue/RabbitMQ)', ()
 
     const notif = notifications[0];
 
-    // Valideer structuur conform AsyncAPI contract
-    expect(notif.notificationId).toBeTruthy();
+    // Valideer structuur conform AsyncAPI contract (echte ajv-schema-validatie, geen losse veld-asserts)
+    assertMatchesSchema(CONTRACT, 'PaymentNotificationPayload', notif);
     expect(notif.orderId).toBe(orderId);
     expect(allowedTypes).toContain(notif.type);
-    expect(notif.message).toBeTruthy();
-    expect(notif.timestamp).toBeTruthy();
-
     expect(notif.type).toBe('PAYMENT_APPROVED');
   });
 
@@ -57,7 +47,9 @@ test.describe('Type 2 – Contract: Payment→Notification (Queue/RabbitMQ)', ()
     const notifications = await notifRes.json();
 
     expect(notifications.length).toBeGreaterThan(0);
-    expect(notifications[notifications.length - 1].type).toBe('PAYMENT_REJECTED');
+    const notif = notifications[notifications.length - 1];
+    assertMatchesSchema(CONTRACT, 'PaymentNotificationPayload', notif);
+    expect(notif.type).toBe('PAYMENT_REJECTED');
   });
 
   test('notificatie voor onbekend orderId retourneert lege lijst', async ({ request }) => {

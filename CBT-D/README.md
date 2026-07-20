@@ -28,9 +28,19 @@ npx playwright test intern/   # UI + contract API tests (Angular → Backend)
 npx playwright test rest/     # REST tussen deelsystemen
 npx playwright test async/    # Queue tests (Payment → Notification)
 npx playwright test soap/     # SOAP tests (Payment → WireMock)
+npx playwright test chain/    # Semantische ketentest Order → Payment → Notification
 
 cd .. && ./stop.sh            # stopt alles netjes af
 ```
+
+## Scenario's toevoegen (onderdeel 5)
+
+Response-validatie loopt via een herbruikbare ajv-fixture (`tests/fixtures/ajv-schema.ts`):
+`assertMatchesSchema(contractFile, schemaName, data)` laadt het JSON Schema uit de gepinde
+OpenAPI/AsyncAPI en valideert `data` ertegen; `getSchema(contractFile, schemaName)` geeft het raw
+schema terug (bv. voor een `enum`-check). Een nieuw scenario toevoegen is een gewone
+Playwright-test die deze fixture aanroept — de YAML-/ajv-plumbing zelf hoeft daarvoor niet
+aangeraakt te worden.
 
 ## Volledig geautomatiseerd
 
@@ -105,8 +115,10 @@ CBT-D/
 └── tests/
     ├── playwright.config.ts
     ├── global-setup.ts       # wacht op alle services voor de tests starten
+    ├── fixtures/             # ajv-schema.ts — herbruikbare fixture (assertMatchesSchema/getSchema)
     ├── intern/               # UI + contract API tests
     ├── rest/                 # REST tussen deelsystemen
     ├── async/                # Queue (RabbitMQ)
-    └── soap/                 # Extern SOAP
+    ├── soap/                 # Extern SOAP
+    └── chain/                # Semantische ketentest Order → Payment → Notification (geen eigen type)
 ```

@@ -1,24 +1,13 @@
 import { test, expect } from '@playwright/test';
-import Ajv from 'ajv';
-import addFormats from 'ajv-formats';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as yaml from 'js-yaml';
+import { assertMatchesSchema, getSchema } from '../fixtures/ajv-schema';
 
 // Contract: contracts/notification-lookup/1.0.0/openapi.yaml
 // Valideert dat GET /api/notifications voldoet aan het gepubliceerde contract
 
 const PAYMENT_URL      = process.env.PAYMENT_URL      ?? 'http://localhost:8081';
 const NOTIFICATION_URL = process.env.NOTIFICATION_URL ?? 'http://localhost:8082';
-
-const doc = yaml.load(
-  fs.readFileSync(path.join(__dirname, '../../../contracts/notification-lookup/1.0.0/openapi.yaml'), 'utf8')
-) as any;
-
-const ajv = new Ajv({ strict: false });
-addFormats(ajv);
-const validateItem = ajv.compile(doc.components.schemas.NotificationResponse);
-const allowedTypes = doc.components.schemas.NotificationResponse.properties.type.enum as string[];
+const CONTRACT = 'notification-lookup/1.0.0/openapi.yaml';
+const allowedTypes = getSchema(CONTRACT, 'NotificationResponse').properties.type.enum as string[];
 
 test.describe('Type 0 – Contract: GET /api/notifications (notification-lookup/openapi.yaml)', () => {
 
@@ -44,9 +33,7 @@ test.describe('Type 0 – Contract: GET /api/notifications (notification-lookup/
     expect(items.length).toBeGreaterThan(0);
 
     for (const item of items) {
-      const valid = validateItem(item);
-      if (!valid) console.error(validateItem.errors);
-      expect(valid).toBe(true);
+      assertMatchesSchema(CONTRACT, 'NotificationResponse', item);
       expect(allowedTypes).toContain(item.type);
     }
   });

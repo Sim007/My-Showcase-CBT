@@ -8,6 +8,7 @@
     "test:rest": "npx playwright test rest/",
     "test:async": "npx playwright test async/",
     "test:soap": "npx playwright test soap/",
+    "test:chain": "npx playwright test chain/",
     "test:ui": "npx playwright test --ui"
   },
   "devDependencies": {

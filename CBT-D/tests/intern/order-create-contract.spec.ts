@@ -1,30 +1,16 @@
 import { test, expect } from '@playwright/test';
-import Ajv from 'ajv';
-import addFormats from 'ajv-formats';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as yaml from 'js-yaml';
+import { assertMatchesSchema, getSchema } from '../fixtures/ajv-schema';
 
 // Contract: contracts/order-create/1.0.0/openapi.yaml
 // Valideert dat POST /api/orders voldoet aan het gepubliceerde contract
 
 const ORDER_URL = process.env.ORDER_URL ?? 'http://localhost:8080';
-
-const doc = yaml.load(
-  fs.readFileSync(path.join(__dirname, '../../../contracts/order-create/1.0.0/openapi.yaml'), 'utf8')
-) as any;
-
-const ajv = new Ajv({ strict: false });
-addFormats(ajv);
-const validateRequest  = ajv.compile(doc.components.schemas.CreateOrderRequest);
-const validateResponse = ajv.compile(doc.components.schemas.OrderResponse);
-const validateError    = ajv.compile(doc.components.schemas.ErrorResponse);
+const CONTRACT = 'order-create/1.0.0/openapi.yaml';
 
 test.describe('Type 0 – Contract: POST /api/orders (order-create/openapi.yaml)', () => {
 
   test('request voldoet aan CreateOrderRequest schema', () => {
-    const body = { amount: 49.95 };
-    expect(validateRequest(body)).toBe(true);
+    assertMatchesSchema(CONTRACT, 'CreateOrderRequest', { amount: 49.95 });
   });
 
   test('response voldoet aan OrderResponse schema', async ({ request }) => {
@@ -33,9 +19,7 @@ test.describe('Type 0 – Contract: POST /api/orders (order-create/openapi.yaml)
     });
     expect(res.status()).toBe(200);
     const body = await res.json();
-    const valid = validateResponse(body);
-    if (!valid) console.error(validateResponse.errors);
-    expect(valid).toBe(true);
+    assertMatchesSchema(CONTRACT, 'OrderResponse', body);
   });
 
   test('response bevat verplichte velden orderId, paymentStatus en approved', async ({ request }) => {
@@ -54,6 +38,20 @@ test.describe('Type 0 – Contract: POST /api/orders (order-create/openapi.yaml)
     });
     expect(res.status()).toBe(400);
     const body = await res.json();
-    expect(validateError(body)).toBe(true);
+    assertMatchesSchema(CONTRACT, 'ErrorResponse', body);
+  });
+
+  test('ontbrekend verplicht veld amount retourneert 400', async ({ request }) => {
+    const res = await request.post(`${ORDER_URL}/api/orders`, {
+      data: {}
+    });
+    expect(res.status()).toBe(400);
+    const body = await res.json();
+    assertMatchesSchema(CONTRACT, 'ErrorResponse', body);
+  });
+
+  test('CreateOrderRequest schema markeert amount als verplicht', () => {
+    const schema = getSchema(CONTRACT, 'CreateOrderRequest');
+    expect(schema.required).toContain('amount');
   });
 });

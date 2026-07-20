@@ -6,8 +6,10 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import nl.showcase.payment.service.PaymentService
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.annotation.*
 
 // Contract: contracts/order-payment/1.0.0/openapi.yaml — annotaties hieronder moeten de
@@ -60,4 +62,17 @@ class PaymentController(private val paymentService: PaymentService) {
         val response = paymentService.processPayment(request.orderId, request.amount)
         return ResponseEntity.ok(response)
     }
+}
+
+// Onderdeel 5 — gevonden door een Playwright-scenario (ontbrekend verplicht request-veld):
+// zonder deze handler geeft een niet-deserialiseerbaar verzoek (bv. ontbrekend orderId) Spring's
+// eigen foutlichaam terug, dat geen "message"-veld heeft — niet-conform met het gepinde
+// ErrorResponse-schema (required: [error, message], zie contracts/order-payment/1.0.0/openapi.yaml).
+@RestControllerAdvice
+class PaymentExceptionHandler {
+    @ExceptionHandler(HttpMessageNotReadableException::class)
+    fun handleUnreadableRequest(ex: HttpMessageNotReadableException): ResponseEntity<ErrorResponse> =
+        ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+            ErrorResponse("INVALID_REQUEST", "Verzoek mist een verplicht veld of is ongeldig JSON")
+        )
 }

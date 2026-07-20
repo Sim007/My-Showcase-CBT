@@ -1,22 +1,11 @@
 import { test, expect } from '@playwright/test';
-import Ajv from 'ajv';
-import addFormats from 'ajv-formats';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as yaml from 'js-yaml';
+import { assertMatchesSchema } from '../fixtures/ajv-schema';
 
 // Type 1: Tussen deelsystemen — Order service roept Payment service aan via REST
 // Contract: contracts/order-payment/1.0.0/openapi.yaml
 
 const ORDER_URL = process.env.ORDER_URL ?? 'http://localhost:8080';
-
-const openApiDoc = yaml.load(
-  fs.readFileSync(path.join(__dirname, '../../../contracts/order-payment/1.0.0/openapi.yaml'), 'utf8')
-) as any;
-
-const ajv = new Ajv({ strict: false });
-addFormats(ajv);
-const validatePaymentResponse = ajv.compile(openApiDoc.components.schemas.PaymentResponse);
+const CONTRACT = 'order-payment/1.0.0/openapi.yaml';
 
 test.describe('Type 1 – Contract: Order→Payment (REST)', () => {
 
@@ -48,9 +37,7 @@ test.describe('Type 1 – Contract: Order→Payment (REST)', () => {
       status: order.paymentStatus,
       approved: order.approved
     };
-    const valid = validatePaymentResponse(paymentShape);
-    if (!valid) console.error('Schema fouten:', validatePaymentResponse.errors);
-    expect(valid).toBe(true);
+    assertMatchesSchema(CONTRACT, 'PaymentResponse', paymentShape);
   });
 
   test('GET /api/orders/{id} retourneert aangemaakte order', async ({ request }) => {

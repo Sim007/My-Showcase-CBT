@@ -1,22 +1,11 @@
 import { test, expect } from '@playwright/test';
-import Ajv from 'ajv';
-import addFormats from 'ajv-formats';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as yaml from 'js-yaml';
+import { assertMatchesSchema } from '../fixtures/ajv-schema';
 
 // Contract: contracts/order-lookup/1.0.0/openapi.yaml
 // Valideert dat GET /api/orders/{id} voldoet aan het gepubliceerde contract
 
 const ORDER_URL = process.env.ORDER_URL ?? 'http://localhost:8080';
-
-const doc = yaml.load(
-  fs.readFileSync(path.join(__dirname, '../../../contracts/order-lookup/1.0.0/openapi.yaml'), 'utf8')
-) as any;
-
-const ajv = new Ajv({ strict: false });
-addFormats(ajv);
-const validateResponse = ajv.compile(doc.components.schemas.OrderResponse);
+const CONTRACT = 'order-lookup/1.0.0/openapi.yaml';
 
 test.describe('Type 0 – Contract: GET /api/orders/{id} (order-lookup/openapi.yaml)', () => {
 
@@ -30,9 +19,7 @@ test.describe('Type 0 – Contract: GET /api/orders/{id} (order-lookup/openapi.y
     const res = await request.get(`${ORDER_URL}/api/orders/${orderId}`);
     expect(res.status()).toBe(200);
     const body = await res.json();
-    const valid = validateResponse(body);
-    if (!valid) console.error(validateResponse.errors);
-    expect(valid).toBe(true);
+    assertMatchesSchema(CONTRACT, 'OrderResponse', body);
   });
 
   test('response bevat hetzelfde orderId als in het pad', async ({ request }) => {

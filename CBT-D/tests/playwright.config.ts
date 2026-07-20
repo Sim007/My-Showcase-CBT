@@ -24,6 +24,10 @@ export default defineConfig({
       name: 'soap – extern SOAP (Payment → WireMock)',
       testDir: './soap',
     },
+    {
+      name: 'chain – keten Order → Payment → Notification',
+      testDir: './chain',
+    },
   ],
   reporter: [['list'], ['html', { open: 'never' }]],
 });
