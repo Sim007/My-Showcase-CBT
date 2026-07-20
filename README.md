@@ -1,6 +1,7 @@
 # Contract Testing Showcase
 
-Monorepo voor een showcase van contract testing langs vier API-typen.
+Monorepo voor een showcase van contract testing langs drie interface-typen (zie
+[Grenzen en contracten](#grenzen-en-contracten) hieronder).
 Bedoeld voor een tribe met 10 feature squads + 1 platform squad.
 
 > **Opstarten en testen → [CBT-D/README.md](CBT-D/README.md)**
