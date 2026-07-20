@@ -6,12 +6,12 @@ import * as path from 'path';
 import * as yaml from 'js-yaml';
 
 // Type 1: Tussen deelsystemen — Order service roept Payment service aan via REST
-// Contract: contracts/order-payment/openapi.yaml
+// Contract: contracts/order-payment/1.0.0/openapi.yaml
 
 const ORDER_URL = process.env.ORDER_URL ?? 'http://localhost:8080';
 
 const openApiDoc = yaml.load(
-  fs.readFileSync(path.join(__dirname, '../../../contracts/order-payment/openapi.yaml'), 'utf8')
+  fs.readFileSync(path.join(__dirname, '../../../contracts/order-payment/1.0.0/openapi.yaml'), 'utf8')
 ) as any;
 
 const ajv = new Ajv({ strict: false });

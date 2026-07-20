@@ -12,7 +12,7 @@ class SoapClient(
     private val restTemplate: RestTemplate,
     @Value("\${soap.provider.url}") private val soapProviderUrl: String
 ) {
-    // Roept externe betaalprovider aan conform contracts/payment-external/payment.wsdl
+    // Roept externe betaalprovider aan conform contracts/payment-external/1.0.0/payment.wsdl
     fun authorize(orderId: String, amount: Double): SoapAuthorizeResult {
         val soapEnvelope = """
             <?xml version="1.0" encoding="UTF-8"?>

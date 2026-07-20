@@ -18,13 +18,13 @@ data class PaymentNotification(
 class NotificationService {
     private val store = ConcurrentHashMap<String, MutableList<PaymentNotification>>()
 
-    // Type 2: ontvangt via RabbitMQ queue (async) — contracts/payment-notification/asyncapi.yaml
+    // Type 2: ontvangt via RabbitMQ queue (async) — contracts/payment-notification/1.0.0/asyncapi.yaml
     @RabbitListener(queues = ["payment.notifications"])
     fun receive(notification: PaymentNotification) {
         store.getOrPut(notification.orderId) { mutableListOf() }.add(notification)
     }
 
-    // Type 1: directe REST-aanmaak — contracts/payment-notification-rest/openapi.yaml
+    // Type 1: directe REST-aanmaak — contracts/payment-notification-rest/1.0.0/openapi.yaml
     fun create(orderId: String, type: String, message: String): PaymentNotification {
         val notification = PaymentNotification(
             notificationId = "notif-${UUID.randomUUID().toString().take(8)}",

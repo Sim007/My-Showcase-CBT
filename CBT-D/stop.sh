@@ -9,6 +9,6 @@ NC='\033[0m'
 log() { echo -e "${GREEN}[stop]${NC} $*"; }
 
 log "Docker services stoppen..."
-docker compose -f "$ROOT/docker-compose.yml" down --remove-orphans
+docker compose -f "$ROOT/docker-compose.yml" --profile local down --remove-orphans
 
 log "Klaar — alle services gestopt."

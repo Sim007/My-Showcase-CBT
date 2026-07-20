@@ -1,18 +1,20 @@
-name: Order Service – Build & Test
+name: Order Service – Squad Pipeline
 
 on:
   push:
     paths:
       - 'order/**'
       - 'contracts/order-payment/**'
+      - 'ci/**'
   pull_request:
     paths:
       - 'order/**'
       - 'contracts/order-payment/**'
+      - 'ci/**'
 
 jobs:
-  build:
-    name: Build Order service
+  pipeline:
+    name: Order squad-pipeline
     runs-on: ubuntu-latest
 
     steps:
@@ -25,10 +27,54 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Build en unit tests
+      - name: build
         working-directory: order/backend
-        run: mvn verify
+        run: mvn -DskipTests package
 
-      - name: Docker image bouwen
+      - name: unit
+        working-directory: order/backend
+        run: mvn test
+
+      - name: contractverificatie
+        run: ./ci/contract-verify.sh --contract order-payment --side consumer
+
+      - name: docker build
         working-directory: order/backend
         run: docker build -t showcase/order:${{ github.sha }} .
+
+      - name: compose up (ci-profiel order)
+        working-directory: CBT-D
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml --profile order up -d --build
+
+      - name: healthcheck
+        run: ./ci/healthcheck.sh --boundary order-payment
+
+      - name: keten-smoke
+        run: ./ci/smoke.sh --boundary order-payment
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: playwright-scenario's
+        working-directory: CBT-D/tests
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          npx playwright test intern/order-lookup-contract.spec.ts intern/order-create-contract.spec.ts rest/order-payment.spec.ts
+        env:
+          ORDER_URL: http://localhost:8080
+          PAYMENT_URL: http://localhost:8081
+
+      - name: Upload Playwright rapport
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-order
+          path: CBT-D/tests/playwright-report/
+
+      - name: compose down
+        if: always()
+        working-directory: CBT-D
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml --profile order down --remove-orphans

@@ -1,0 +1,40 @@
+name: Diff-gate – Contracten
+
+on:
+  pull_request:
+    paths:
+      - 'contracts/**'
+
+jobs:
+  diff-gate:
+    name: diff-gate (${{ matrix.contract }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        contract:
+          - order-payment
+          - order-create
+          - order-lookup
+          - notification-lookup
+          - payment-notification
+          - payment-notification-rest
+          - payment-external
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Wijzigde contracten bepalen
+        id: changed
+        run: |
+          if git diff --name-only "origin/${{ github.event.pull_request.base.ref }}"...HEAD | grep -q "^contracts/${{ matrix.contract }}/"; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: diff-gate
+        if: steps.changed.outputs.changed == 'true'
+        run: ./ci/diff-gate.sh --contract ${{ matrix.contract }}

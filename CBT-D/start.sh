@@ -23,7 +23,7 @@ command -v docker >/dev/null 2>&1 || fail "Docker niet gevonden"
 # ---------------------------------------------------------------------------
 PORTS=(4200 4201 4202 4203 5672 8080 8081 8082 8083 15672)
 log "Bestaande containers stoppen..."
-docker compose -f "$ROOT/docker-compose.yml" down --remove-orphans 2>/dev/null || true
+docker compose -f "$ROOT/docker-compose.yml" --profile local down --remove-orphans 2>/dev/null || true
 
 log "Poorten controleren op overgebleven processen..."
 for port in "${PORTS[@]}"; do
@@ -40,7 +40,7 @@ done
 # 3. Alle services opstarten via Docker Compose
 # ---------------------------------------------------------------------------
 log "Alle services opstarten (Docker Compose)..."
-docker compose -f "$ROOT/docker-compose.yml" up --build -d
+docker compose -f "$ROOT/docker-compose.yml" --profile local up --build -d
 
 # ---------------------------------------------------------------------------
 # 4. Wachten op health endpoints

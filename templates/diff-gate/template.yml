@@ -1,0 +1,30 @@
+# GitLab CI/CD Component — referentie-implementatie, draait niet in deze
+# GitHub-gehoste repo. Spiegelt 1-op-1 de parametersignatuur van
+# ci/diff-gate.sh (de draaiende laag is GitHub Actions, zie
+# .github/workflows/diff-gate.yml). Zie templates/README.md.
+
+spec:
+  inputs:
+    contract:
+      description: "Naam van het contract onder contracts/, bv. order-payment"
+    report_only:
+      description: "Bij true: FAIL blokkeert de pipeline niet"
+      type: boolean
+      default: false
+---
+
+diff-gate:
+  stage: contract-gate
+  image: docker:26
+  services:
+    - docker:26-dind
+  rules:
+    - changes:
+        - "contracts/$[[ inputs.contract ]]/**/*"
+  script:
+    - |
+      if [ "$[[ inputs.report_only ]]" = "true" ]; then
+        ./ci/diff-gate.sh --contract "$[[ inputs.contract ]]" --report-only
+      else
+        ./ci/diff-gate.sh --contract "$[[ inputs.contract ]]"
+      fi

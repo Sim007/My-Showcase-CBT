@@ -5,7 +5,7 @@ import nl.showcase.notification.service.PaymentNotification
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
-// Type 1 request body — contracts/payment-notification-rest/openapi.yaml
+// Type 1 request body — contracts/payment-notification-rest/1.0.0/openapi.yaml
 data class CreateNotificationRequest(val orderId: String, val type: String, val message: String)
 data class ErrorResponse(val error: String, val message: String)
 

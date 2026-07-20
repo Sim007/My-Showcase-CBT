@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Bean
 @SpringBootApplication
 class NotificationApplication {
 
-    // Queue naam conform contracts/payment-notification/asyncapi.yaml
+    // Queue naam conform contracts/payment-notification/1.0.0/asyncapi.yaml
     @Bean
     fun notificationQueue() = Queue("payment.notifications", true)
 

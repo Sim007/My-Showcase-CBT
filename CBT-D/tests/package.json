@@ -4,10 +4,10 @@
   "description": "Playwright contract tests voor de showcase",
   "scripts": {
     "test": "npx playwright test",
-    "test:type0": "npx playwright test type0/",
-    "test:type1": "npx playwright test type1/",
-    "test:type2": "npx playwright test type2/",
-    "test:type3": "npx playwright test type3/",
+    "test:intern": "npx playwright test intern/",
+    "test:rest": "npx playwright test rest/",
+    "test:async": "npx playwright test async/",
+    "test:soap": "npx playwright test soap/",
     "test:ui": "npx playwright test --ui"
   },
   "devDependencies": {

@@ -8,21 +8,21 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   projects: [
     {
-      name: 'type0 – binnen deelsysteem (Angular UI → Backend)',
-      testDir: './type0',
+      name: 'intern – binnen deelsysteem (Angular UI → Backend)',
+      testDir: './intern',
       use: { baseURL: 'http://localhost:4200', navigationTimeout: 45_000 },
     },
     {
-      name: 'type1 – tussen deelsystemen (Order → Payment)',
-      testDir: './type1',
+      name: 'rest – tussen deelsystemen (Order → Payment)',
+      testDir: './rest',
     },
     {
-      name: 'type2 – queue (Payment → Notification)',
-      testDir: './type2',
+      name: 'async – queue (Payment → Notification)',
+      testDir: './async',
     },
     {
-      name: 'type3 – extern SOAP (Payment → WireMock)',
-      testDir: './type3',
+      name: 'soap – extern SOAP (Payment → WireMock)',
+      testDir: './soap',
     },
   ],
   reporter: [['list'], ['html', { open: 'never' }]],

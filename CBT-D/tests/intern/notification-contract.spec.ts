@@ -5,14 +5,14 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as yaml from 'js-yaml';
 
-// Contract: contracts/notification-lookup/openapi.yaml
+// Contract: contracts/notification-lookup/1.0.0/openapi.yaml
 // Valideert dat GET /api/notifications voldoet aan het gepubliceerde contract
 
 const PAYMENT_URL      = process.env.PAYMENT_URL      ?? 'http://localhost:8081';
 const NOTIFICATION_URL = process.env.NOTIFICATION_URL ?? 'http://localhost:8082';
 
 const doc = yaml.load(
-  fs.readFileSync(path.join(__dirname, '../../../contracts/notification-lookup/openapi.yaml'), 'utf8')
+  fs.readFileSync(path.join(__dirname, '../../../contracts/notification-lookup/1.0.0/openapi.yaml'), 'utf8')
 ) as any;
 
 const ajv = new Ajv({ strict: false });

@@ -5,13 +5,13 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as yaml from 'js-yaml';
 
-// Contract: contracts/order-create/openapi.yaml
+// Contract: contracts/order-create/1.0.0/openapi.yaml
 // Valideert dat POST /api/orders voldoet aan het gepubliceerde contract
 
 const ORDER_URL = process.env.ORDER_URL ?? 'http://localhost:8080';
 
 const doc = yaml.load(
-  fs.readFileSync(path.join(__dirname, '../../../contracts/order-create/openapi.yaml'), 'utf8')
+  fs.readFileSync(path.join(__dirname, '../../../contracts/order-create/1.0.0/openapi.yaml'), 'utf8')
 ) as any;
 
 const ajv = new Ajv({ strict: false });

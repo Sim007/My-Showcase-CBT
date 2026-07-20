@@ -20,7 +20,7 @@ class PaymentService(
     private val rabbitTemplate: RabbitTemplate,
     private val notificationClient: NotificationClient
 ) {
-    // Queue naam conform contracts/payment-notification/asyncapi.yaml
+    // Queue naam conform contracts/payment-notification/1.0.0/asyncapi.yaml
     private val notificationQueue = "payment.notifications"
 
     fun processPayment(orderId: String, amount: Double): PaymentResponse {
@@ -31,7 +31,7 @@ class PaymentService(
         val type = if (soapResult.approved) "PAYMENT_APPROVED" else "PAYMENT_REJECTED"
         val message = "Betaling voor order $orderId is ${if (soapResult.approved) "goedgekeurd" else "afgewezen"}"
 
-        // Type 2: async publiceren naar queue — contracts/payment-notification/asyncapi.yaml
+        // Type 2: async publiceren naar queue — contracts/payment-notification/1.0.0/asyncapi.yaml
         val queueNotification = PaymentNotification(
             notificationId = "notif-${UUID.randomUUID().toString().take(8)}",
             orderId = orderId,
@@ -41,7 +41,7 @@ class PaymentService(
         )
         rabbitTemplate.convertAndSend(notificationQueue, queueNotification)
 
-        // Type 1: directe REST-aanroep naar Notification service — contracts/payment-notification-rest/openapi.yaml
+        // Type 1: directe REST-aanroep naar Notification service — contracts/payment-notification-rest/1.0.0/openapi.yaml
         notificationClient.create(orderId, type, message)
 
         return PaymentResponse(

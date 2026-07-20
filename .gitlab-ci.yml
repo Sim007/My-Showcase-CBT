@@ -1,0 +1,31 @@
+# Referentie-implementatie van de CI-architectuur op GitLab CI/CD-componenten.
+# Draait NIET in deze repo (die is GitHub-gehost) — de draaiende laag is
+# .github/workflows/. Dit bestand toont hoe dezelfde ci/*.sh-scripts als
+# GitLab-componenten geconsumeerd zouden worden, mocht deze showcase ooit
+# naar GitLab verhuizen. Zie templates/README.md.
+
+stages:
+  - contract-gate
+  - build
+  - unit
+  - contract-verify
+  - docker-build
+  - compose-up
+  - deployment-healthcheck
+  - keten-smoke
+  - playwright
+
+include:
+  - local: 'templates/diff-gate/template.yml'
+    inputs:
+      contract: order-payment
+  - local: 'templates/contract-verify/template.yml'
+    inputs:
+      contract: order-payment
+      side: provider
+  - local: 'templates/healthcheck/template.yml'
+    inputs:
+      boundary: order-payment
+  - local: 'templates/smoke/template.yml'
+    inputs:
+      boundary: order-payment

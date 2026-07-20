@@ -1,4 +1,4 @@
-name: Payment Service – Build & Test
+name: Payment Service – Squad Pipeline
 
 on:
   push:
@@ -6,15 +6,21 @@ on:
       - 'payment/backend/**'
       - 'contracts/order-payment/**'
       - 'contracts/payment-notification/**'
+      - 'contracts/payment-notification-rest/**'
       - 'contracts/payment-external/**'
+      - 'ci/**'
   pull_request:
     paths:
       - 'payment/backend/**'
-      - 'contracts/**'
+      - 'contracts/order-payment/**'
+      - 'contracts/payment-notification/**'
+      - 'contracts/payment-notification-rest/**'
+      - 'contracts/payment-external/**'
+      - 'ci/**'
 
 jobs:
-  build:
-    name: Build Payment service
+  pipeline:
+    name: Payment squad-pipeline
     runs-on: ubuntu-latest
 
     steps:
@@ -27,10 +33,56 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Build en unit tests
+      - name: build
         working-directory: payment/backend
-        run: mvn verify
+        run: mvn -DskipTests package
 
-      - name: Docker image bouwen
+      - name: unit
+        working-directory: payment/backend
+        run: mvn test
+
+      - name: contractverificatie
+        run: ./ci/contract-verify.sh --contract order-payment --side provider
+
+      - name: docker build
         working-directory: payment/backend
         run: docker build -t showcase/payment:${{ github.sha }} .
+
+      - name: compose up (ci-profiel payment)
+        working-directory: CBT-D
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml --profile payment up -d --build
+
+      - name: healthcheck
+        run: ./ci/healthcheck.sh --boundary order-payment
+
+      - name: keten-smoke
+        run: ./ci/smoke.sh --boundary order-payment
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: playwright-scenario's
+        working-directory: CBT-D/tests
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          npx playwright test intern/payment-contract.spec.ts rest/payment-notification-rest.spec.ts async/payment-notification.spec.ts soap/payment-soap.spec.ts
+        env:
+          ORDER_URL: http://localhost:8080
+          PAYMENT_URL: http://localhost:8081
+          NOTIFICATION_URL: http://localhost:8082
+          WIREMOCK_URL: http://localhost:8083
+
+      - name: Upload Playwright rapport
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-payment
+          path: CBT-D/tests/playwright-report/
+
+      - name: compose down
+        if: always()
+        working-directory: CBT-D
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml --profile payment down --remove-orphans

@@ -1,0 +1,18 @@
+# GitLab CI/CD Component — referentie-implementatie, draait niet in deze
+# GitHub-gehoste repo. Spiegelt de parametersignatuur van ci/smoke.sh.
+# Script zelf is nog een placeholder (onderdeel 7) — deze component ook.
+
+spec:
+  inputs:
+    boundary:
+      description: "Naam van de grens, of leeg voor alle grenzen"
+      default: ""
+---
+
+keten-smoke:
+  stage: keten-smoke
+  script:
+    - |
+      ARGS=""
+      [ -n "$[[ inputs.boundary ]]" ] && ARGS="--boundary $[[ inputs.boundary ]]"
+      ./ci/smoke.sh $ARGS

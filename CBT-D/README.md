@@ -23,11 +23,11 @@ cd CBT-D
 ./start.sh                    # bouwt images, start services, wacht op health
 
 cd tests
-npx playwright test           # alle types
-npx playwright test type0/    # UI + contract API tests (Angular → Backend)
-npx playwright test type1/    # REST tussen deelsystemen
-npx playwright test type2/    # Queue tests (Payment → Notification)
-npx playwright test type3/    # SOAP tests (Payment → WireMock)
+npx playwright test           # alle grenzen
+npx playwright test intern/   # UI + contract API tests (Angular → Backend)
+npx playwright test rest/     # REST tussen deelsystemen
+npx playwright test async/    # Queue tests (Payment → Notification)
+npx playwright test soap/     # SOAP tests (Payment → WireMock)
 
 cd .. && ./stop.sh            # stopt alles netjes af
 ```
@@ -49,10 +49,17 @@ Na een Reload Window pikt de extensie de testsuites op.
 ## Handmatig via Docker Compose
 
 ```bash
-docker compose up --build          # alles starten
-docker compose down                # stoppen
-docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d   # CI-mode
+docker compose --profile local up --build          # alles starten (lokaal)
+docker compose --profile local down                # stoppen
+docker compose -f docker-compose.yml -f docker-compose.ci.yml --profile order up -d       # alleen Order + zijn dependencies
+docker compose -f docker-compose.yml -f docker-compose.ci.yml --profile payment up -d     # alleen Payment + zijn dependencies
+docker compose -f docker-compose.yml -f docker-compose.ci.yml --profile notification up -d # alleen Notification + zijn dependencies
 ```
+
+De profielen `order`/`payment`/`notification` starten alleen het eigen deelsysteem plus zijn
+huidige (échte) runtime-dependencies — ze bevatten nog geen WireMock-stubs voor providers, dat
+volgt in onderdeel 2. Profiel `local` (gebruikt door `start.sh`/`sts.sh`) start alles, inclusief
+alle frontends en de portal.
 
 ## Omgevingsvariabelen voor tests
 
@@ -98,8 +105,8 @@ CBT-D/
 └── tests/
     ├── playwright.config.ts
     ├── global-setup.ts       # wacht op alle services voor de tests starten
-    ├── type0/                # UI + contract API tests
-    ├── type1/                # REST tussen deelsystemen
-    ├── type2/                # Queue (RabbitMQ)
-    └── type3/                # Extern SOAP
+    ├── intern/               # UI + contract API tests
+    ├── rest/                 # REST tussen deelsystemen
+    ├── async/                # Queue (RabbitMQ)
+    └── soap/                 # Extern SOAP
 ```

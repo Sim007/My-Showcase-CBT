@@ -4,7 +4,7 @@ import nl.showcase.payment.service.PaymentService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
-// Contract: contracts/order-payment/openapi.yaml
+// Contract: contracts/order-payment/1.0.0/openapi.yaml
 data class PaymentRequest(val orderId: String, val amount: Double)
 data class PaymentResponse(
     val paymentId: String,

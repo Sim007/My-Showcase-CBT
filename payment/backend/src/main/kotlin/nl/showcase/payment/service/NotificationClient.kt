@@ -14,7 +14,7 @@ data class NotificationResponse(
     val timestamp: String
 )
 
-// Type 1: Payment roept Notification aan via REST — contracts/payment-notification-rest/openapi.yaml
+// Type 1: Payment roept Notification aan via REST — contracts/payment-notification-rest/1.0.0/openapi.yaml
 @Component
 class NotificationClient(
     private val restTemplate: RestTemplate,

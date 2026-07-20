@@ -6,13 +6,13 @@ import * as path from 'path';
 import * as yaml from 'js-yaml';
 
 // Type 1: Tussen deelsystemen — Payment service (consumer) → Notification service (provider) via REST
-// Contract: contracts/payment-notification-rest/openapi.yaml
+// Contract: contracts/payment-notification-rest/1.0.0/openapi.yaml
 
 const PAYMENT_URL      = process.env.PAYMENT_URL      ?? 'http://localhost:8081';
 const NOTIFICATION_URL = process.env.NOTIFICATION_URL ?? 'http://localhost:8082';
 
 const doc = yaml.load(
-  fs.readFileSync(path.join(__dirname, '../../../contracts/payment-notification-rest/openapi.yaml'), 'utf8')
+  fs.readFileSync(path.join(__dirname, '../../../contracts/payment-notification-rest/1.0.0/openapi.yaml'), 'utf8')
 ) as any;
 
 const ajv = new Ajv({ strict: false });

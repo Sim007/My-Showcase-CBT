@@ -1,18 +1,24 @@
-name: Notification Service – Build & Test
+name: Notification Service – Squad Pipeline
 
 on:
   push:
     paths:
       - 'notification/**'
+      - 'contracts/notification-lookup/**'
       - 'contracts/payment-notification/**'
+      - 'contracts/payment-notification-rest/**'
+      - 'ci/**'
   pull_request:
     paths:
       - 'notification/**'
+      - 'contracts/notification-lookup/**'
       - 'contracts/payment-notification/**'
+      - 'contracts/payment-notification-rest/**'
+      - 'ci/**'
 
 jobs:
-  build:
-    name: Build Notification service
+  pipeline:
+    name: Notification squad-pipeline
     runs-on: ubuntu-latest
 
     steps:
@@ -25,10 +31,54 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Build en unit tests
+      - name: build
         working-directory: notification/backend
-        run: mvn verify
+        run: mvn -DskipTests package
 
-      - name: Docker image bouwen
+      - name: unit
+        working-directory: notification/backend
+        run: mvn test
+
+      - name: contractverificatie
+        run: ./ci/contract-verify.sh --contract payment-notification --side provider
+
+      - name: docker build
         working-directory: notification/backend
         run: docker build -t showcase/notification:${{ github.sha }} .
+
+      - name: compose up (ci-profiel notification)
+        working-directory: CBT-D
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml --profile notification up -d --build
+
+      - name: healthcheck
+        run: ./ci/healthcheck.sh --boundary payment-notification
+
+      - name: keten-smoke
+        run: ./ci/smoke.sh --boundary payment-notification
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: playwright-scenario's
+        working-directory: CBT-D/tests
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          npx playwright test intern/notification-contract.spec.ts rest/payment-notification-rest.spec.ts async/payment-notification.spec.ts
+        env:
+          PAYMENT_URL: http://localhost:8081
+          NOTIFICATION_URL: http://localhost:8082
+
+      - name: Upload Playwright rapport
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-notification
+          path: CBT-D/tests/playwright-report/
+
+      - name: compose down
+        if: always()
+        working-directory: CBT-D
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml --profile notification down --remove-orphans

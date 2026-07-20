@@ -20,7 +20,7 @@ class OrderService(
     fun createOrder(amount: Double): OrderResponse {
         val orderId = "order-${UUID.randomUUID().toString().take(8)}"
 
-        // Roep Payment service aan conform contracts/order-payment/openapi.yaml
+        // Roep Payment service aan conform contracts/order-payment/1.0.0/openapi.yaml
         val paymentRequest = PaymentRequest(orderId = orderId, amount = amount)
         val paymentResponse = restTemplate.postForObject(
             "$paymentServiceUrl/api/payments",
