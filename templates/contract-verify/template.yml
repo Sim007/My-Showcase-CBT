@@ -1,7 +1,8 @@
 # GitLab CI/CD Component — referentie-implementatie, draait niet in deze
-# GitHub-gehoste repo. Spiegelt de parametersignatuur van
-# ci/contract-verify.sh. Script zelf is nog een placeholder (onderdeel 2-4
-# van claude-code.prompt.md) — deze component ook.
+# GitHub-gehoste repo. Spiegelt de parametersignatuur van het inmiddels
+# functionele ci/contract-verify.sh (order-payment en payment-notification
+# beide kanten uit onderdeel 2-3, payment-external consumerkant uit
+# onderdeel 4).
 
 spec:
   inputs:

@@ -197,6 +197,18 @@ onderdeel, in tegenstelling tot diff-gate/healthcheck).
 checkte alleen `--boundary order-payment`, terwijl Payment zelf alle drie de grenzen raakt — nu
 `./ci/smoke.sh` zonder vlag (alle drie).
 
+## Pijplijnvolgorde (onderdeel 8)
+
+Geaudit, geen wijziging nodig: alle drie de GitHub-workflows volgden de vaste volgorde
+(`build → unit → contractverificatie → docker build → compose up → healthcheck → keten-smoke →
+Playwright-scenario's`) al exact, incrementeel correct opgebouwd sinds onderdeel 0. `diff-gate.yml`
+was al een eigen job, getriggerd op `contracts/**`-wijzigingen. Wat wél achterliep: de
+GitLab-referentie in `templates/` — de headercommentaren en de statustabel in
+`templates/README.md` noemden `contract-verify`/`healthcheck`/`smoke` nog "placeholder" terwijl ze
+allang functioneel waren (onderdeel 2-7), en `templates/.gitlab-ci.yml.example` toonde alleen de
+vier gate-componenten zonder de tussenliggende `build`/`unit`/`docker-build`/`compose-up`-stappen.
+Beide bijgewerkt zodat de referentie weer 1-op-1 de draaiende laag weerspiegelt.
+
 ## Playwright-conventie (onderdeel 5)
 
 Response-validatie loopt via één herbruikbare fixture, `CBT-D/tests/fixtures/ajv-schema.ts`:

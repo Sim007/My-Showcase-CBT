@@ -6,6 +6,13 @@
 # toont alleen hoe dezelfde ci/*.sh-scripts als GitLab-componenten geconsumeerd
 # zouden worden, mocht deze showcase ooit naar GitLab verhuizen — kopieer het
 # dan pas naar de repo-root. Zie templates/README.md.
+#
+# Illustreert Payment's squad-pipeline (de meest volledige: serveert twee
+# grenzen, consumeert twee) — onderdeel 8's vaste volgorde build → unit →
+# contractverificatie → docker build (OCI-labels) → compose up → healthcheck →
+# keten-smoke → Playwright, exact zoals die al draait in
+# .github/workflows/payment.yml. build/unit/docker-build/compose-up zijn geen
+# gate-scripts en hebben dus geen eigen component — kale jobs volstaan.
 
 stages:
   - contract-gate
@@ -30,5 +37,30 @@ include:
     inputs:
       boundary: order-payment
   - local: 'templates/smoke/template.yml'
-    inputs:
-      boundary: order-payment
+    inputs: {}
+
+build:
+  stage: build
+  script:
+    - cd payment/backend && mvn -DskipTests package
+
+unit:
+  stage: unit
+  script:
+    - cd payment/backend && mvn test
+
+docker-build:
+  stage: docker-build
+  image: docker:26
+  services:
+    - docker:26-dind
+  script:
+    # ci/docker-build.sh leest de pins uit pom.xml en zet ze als OCI-labels
+    # (contracts.serves/contracts.consumes) — zelfde bron van waarheid als
+    # /actuator/info, zie onderdeel 1.
+    - ./ci/docker-build.sh --service payment --context payment/backend --tag "$CI_COMMIT_SHA"
+
+compose-up:
+  stage: compose-up
+  script:
+    - cd CBT-D && docker compose -f docker-compose.yml -f docker-compose.ci.yml --profile payment up -d --build

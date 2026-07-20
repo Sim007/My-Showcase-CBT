@@ -12,12 +12,17 @@ een script z'n signatuur, werk dan ook de bijbehorende `spec: inputs:` hier bij.
 | Component            | Roept aan               | Status                        |
 |-----------------------|--------------------------|--------------------------------|
 | `diff-gate/`          | `ci/diff-gate.sh`        | Component + script functioneel |
-| `contract-verify/`    | `ci/contract-verify.sh`  | Component klaar, script is placeholder (onderdeel 2-4) |
-| `healthcheck/`        | `ci/healthcheck.sh`      | Component klaar, script is placeholder (onderdeel 6) |
-| `smoke/`               | `ci/smoke.sh`            | Component klaar, script is placeholder (onderdeel 7) |
+| `contract-verify/`    | `ci/contract-verify.sh`  | Component + script functioneel |
+| `healthcheck/`        | `ci/healthcheck.sh`      | Component + script functioneel |
+| `smoke/`               | `ci/smoke.sh`            | Component + script functioneel |
 
-`.gitlab-ci.yml.example` in deze map toont hoe de componenten met inputs geconsumeerd worden.
-Bewust **niet** in de repo-root gezet en met een `.example`-extensie: een echte
-`.gitlab-ci.yml` op root-niveau zou bij een eventuele GitLab-mirror automatisch oppikken en
-naast de draaiende `.github/workflows/`-laag een tweede CI laten draaien — precies de
-dubbele-onderhoudslast die deze architectuur vermijdt.
+Alle vier de gate-scripts uit de bouwprompt (onderdeel 2-7) zijn nu functioneel — deze tabel
+wijzigt niet meer tenzij een script z'n parametersignatuur verandert.
+
+`.gitlab-ci.yml.example` in deze map toont hoe de componenten met inputs geconsumeerd worden,
+inclusief de niet-gate-stappen (`build`/`unit`/`docker-build`/`compose-up`) ertussen — samen de
+volledige per-deelsysteem-pijplijnvolgorde uit onderdeel 8, zoals die al draait in
+`.github/workflows/payment.yml`. Bewust **niet** in de repo-root gezet en met een
+`.example`-extensie: een echte `.gitlab-ci.yml` op root-niveau zou bij een eventuele
+GitLab-mirror automatisch oppikken en naast de draaiende `.github/workflows/`-laag een tweede CI
+laten draaien — precies de dubbele-onderhoudslast die deze architectuur vermijdt.
