@@ -34,6 +34,26 @@ naar buiten de tribe. Vol gate-regime (diff-gate, pins, healthcheck) geldt allee
     gate-regime (diff-gate, pins, healthcheck) volgt hierop pas ná de drie primaire grenzen
     (`order-payment`, `payment-notification`, `payment-external`); zie CLAUDE.md.
 
+## Zelfverklaring
+
+Elk backend-deelsysteem legt via `/actuator/info` vast welke contractversies het **serveert**
+en welke het **pint als consumer** — bewijst dat pins en werkelijkheid bij elkaar horen zonder
+handmatig na te zoeken:
+
+```bash
+curl -s localhost:8081/actuator/info | jq .contracts
+# { "serves": {"order-payment":"1.0.0","payment-notification":"1.0.0"},
+#   "consumes": {"payment-external":"1.0.0","payment-notification-rest":"1.0.0"} }
+```
+
+Enige bron van waarheid is de `<properties>`-sectie in de `pom.xml` van elke service
+(`contracts.serves.<naam>` / `contracts.consumes.<naam>`). Twee dingen lezen daaruit, zonder
+onderlinge duplicatie:
+- **`/actuator/info`** — via Maven resource filtering van `application.yml` (`@`-delimiters, om
+  Spring's eigen `${...}`-placeholders niet te verstoren).
+- **OCI-labels op de Docker-image** — `ci/docker-build.sh` (gedeeld script, 3x aangeroepen) leest
+  dezelfde properties via `ci/lib/pins.sh` en geeft ze als `--build-arg` mee aan `docker build`.
+
 ## Stack
 
 | Onderdeel  | Technologie                                           |

@@ -43,8 +43,7 @@ jobs:
         run: ./ci/contract-verify.sh --contract payment-notification --side provider
 
       - name: docker build
-        working-directory: notification/backend
-        run: docker build -t showcase/notification:${{ github.sha }} .
+        run: ./ci/docker-build.sh --service notification --context notification/backend --tag ${{ github.sha }}
 
       - name: compose up (ci-profiel notification)
         working-directory: CBT-D

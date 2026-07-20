@@ -13,7 +13,21 @@ management:
   endpoint:
     health:
       show-details: always
+  info:
+    env:
+      enabled: true
 
 spring:
   application:
     name: order-service
+
+# Zelfverklaring (onderdeel 1): waarden komen via Maven resource filtering
+# (@-delimiters, zie pom.xml) uit de contracts.*-properties — geen hardcoded
+# duplicatie. Zelfde waarden staan als OCI-labels op de Dockerfile.
+info:
+  contracts:
+    serves:
+      order-create: "@contracts.serves.order-create@"
+      order-lookup: "@contracts.serves.order-lookup@"
+    consumes:
+      order-payment: "@contracts.consumes.order-payment@"

@@ -45,8 +45,7 @@ jobs:
         run: ./ci/contract-verify.sh --contract order-payment --side provider
 
       - name: docker build
-        working-directory: payment/backend
-        run: docker build -t showcase/payment:${{ github.sha }} .
+        run: ./ci/docker-build.sh --service payment --context payment/backend --tag ${{ github.sha }}
 
       - name: compose up (ci-profiel payment)
         working-directory: CBT-D

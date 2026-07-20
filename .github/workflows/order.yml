@@ -39,8 +39,7 @@ jobs:
         run: ./ci/contract-verify.sh --contract order-payment --side consumer
 
       - name: docker build
-        working-directory: order/backend
-        run: docker build -t showcase/order:${{ github.sha }} .
+        run: ./ci/docker-build.sh --service order --context order/backend --tag ${{ github.sha }}
 
       - name: compose up (ci-profiel order)
         working-directory: CBT-D

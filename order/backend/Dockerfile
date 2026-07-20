@@ -9,6 +9,15 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 COPY --from=build /app/target/*.jar app.jar
+
+# Zelfverklaring (onderdeel 1): zelfde waarden als info.contracts.* op
+# /actuator/info. Waarden komen van buitenaf via --build-arg (ci/docker-build.sh
+# leest ze uit pom.xml) — nooit hardcoded, geen duplicatie.
+ARG CONTRACTS_SERVES=""
+ARG CONTRACTS_CONSUMES=""
+LABEL nl.showcase.contracts.serves="${CONTRACTS_SERVES}"
+LABEL nl.showcase.contracts.consumes="${CONTRACTS_CONSUMES}"
+
 EXPOSE 8080
 USER appuser
 ENTRYPOINT ["java", "-jar", "app.jar"]
