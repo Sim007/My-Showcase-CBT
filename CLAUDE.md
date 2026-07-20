@@ -48,7 +48,8 @@ In deze repo is dat omgedraaid — bewuste beslissing, vastgelegd tijdens het pl
   beide kanten), `payment-external` (onderdeel 4, alleen consumerkant — `--side provider` geeft
   een expliciete "n.v.t., buiten de tribe"-melding, geen NOT-IMPLEMENTED). Overige,
   niet-geïmplementeerde contractnamen vallen nog terug op `NOT-IMPLEMENTED`.
-  `healthcheck.sh`/`smoke.sh` zijn nog placeholders (onderdelen 6, 7).
+  `ci/healthcheck.sh` is functioneel (onderdeel 6, zie eigen sectie hieronder). `smoke.sh` is nog
+  een placeholder (onderdeel 7).
 
 ## Contractverificatie-tooling (bevindingen uit onderdeel 2 — niet gokken, altijd verifiëren)
 
@@ -157,6 +158,27 @@ compose-up, dus vóór er een broker draait.
 | `CBT-D/tests/chain/`   | cross-cutting — geen eigen type | `order-payment` + `payment-notification` (semantische keten, geen schemaherhaling) |
 
 `payment-notification-rest` is een tweede type-2-sync-grens; pas oppakken ná de drie primaire grenzen.
+
+## Deployment-healthcheck (onderdeel 6)
+
+`ci/healthcheck.sh` bouwt de grens-graaf **hardcoded in het script** (drie vaste grenzen, geen
+configbestand nodig): `order-payment` (provider=payment, consumer=order), `payment-notification`
+(provider=payment, consumer=notification), `payment-external` (alleen consumer=payment — geen
+lokale provider, zelfde "n.v.t."-behandeling als `ci/contract-verify.sh`'s
+`payment-external-provider`-tak). Per grens: `curl .../actuator/info` bij provider en consumer,
+vergelijk **major gelijk** én **pin-minor ≤ served-minor**. **Bewust geen `jq`** — dit repo parseert
+JSON/semver overal met kale `grep`/`sed`/`cut` (zie `diff-gate.sh`'s `major()`-helper); healthcheck
+volgt dezelfde stijl i.p.v. een nieuwe dependency te introduceren. `--boundary <naam>` beperkt tot
+één grens (zo roepen de drie workflows hem nu al aan); zonder de vlag worden alle drie gecontroleerd.
+`--report-only` degradeert een FAIL naar een niet-blokkerende melding (zelfde patroon als
+`diff-gate.sh`).
+
+**Geverifieerd met een echte mismatch** (niet alleen gelezen): Order's
+`contracts.consumes.order-payment` tijdelijk op `2.5.0` gezet terwijl Payment
+`contracts.serves.order-payment` op `2.3.0` stond (demo-scenario 3 uit de bouwprompt) — beide
+containers herbouwd, `/actuator/info` bevestigde de mismatch, en `ci/healthcheck.sh --boundary
+order-payment` gaf exact `FAIL order-payment: pinned 2.5.0, served 2.3.0` met exit 1 (exit 0 met
+`--report-only`). Daarna volledig teruggedraaid.
 
 ## Playwright-conventie (onderdeel 5)
 
