@@ -16,5 +16,8 @@ een script z'n signatuur, werk dan ook de bijbehorende `spec: inputs:` hier bij.
 | `healthcheck/`        | `ci/healthcheck.sh`      | Component klaar, script is placeholder (onderdeel 6) |
 | `smoke/`               | `ci/smoke.sh`            | Component klaar, script is placeholder (onderdeel 7) |
 
-Het root-`.gitlab-ci.yml` toont hoe deze componenten met inputs geconsumeerd worden — ook
-dat bestand draait niet in deze repo, het is illustratief.
+`.gitlab-ci.yml.example` in deze map toont hoe de componenten met inputs geconsumeerd worden.
+Bewust **niet** in de repo-root gezet en met een `.example`-extensie: een echte
+`.gitlab-ci.yml` op root-niveau zou bij een eventuele GitLab-mirror automatisch oppikken en
+naast de draaiende `.github/workflows/`-laag een tweede CI laten draaien — precies de
+dubbele-onderhoudslast die deze architectuur vermijdt.

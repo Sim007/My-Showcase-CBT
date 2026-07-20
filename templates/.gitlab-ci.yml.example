@@ -1,0 +1,34 @@
+# Voorbeeldconsumptie van de GitLab CI/CD-componenten in deze map — illustratief,
+# NIET actief. Bewust hernoemd naar .gitlab-ci.yml.example en verplaatst naar
+# templates/ (niet de repo-root): een .gitlab-ci.yml in de root zou GitLab bij
+# een eventuele mirror automatisch oppikken en naast de draaiende
+# .github/workflows/-laag een tweede, ongewenste CI laten draaien. Dit bestand
+# toont alleen hoe dezelfde ci/*.sh-scripts als GitLab-componenten geconsumeerd
+# zouden worden, mocht deze showcase ooit naar GitLab verhuizen — kopieer het
+# dan pas naar de repo-root. Zie templates/README.md.
+
+stages:
+  - contract-gate
+  - build
+  - unit
+  - contract-verify
+  - docker-build
+  - compose-up
+  - deployment-healthcheck
+  - keten-smoke
+  - playwright
+
+include:
+  - local: 'templates/diff-gate/template.yml'
+    inputs:
+      contract: order-payment
+  - local: 'templates/contract-verify/template.yml'
+    inputs:
+      contract: order-payment
+      side: provider
+  - local: 'templates/healthcheck/template.yml'
+    inputs:
+      boundary: order-payment
+  - local: 'templates/smoke/template.yml'
+    inputs:
+      boundary: order-payment

@@ -30,8 +30,11 @@ In deze repo is dat omgedraaid — bewuste beslissing, vastgelegd tijdens het pl
   zonder eigen logica — een stap is altijd één aanroep naar een `ci/`-script.
 - **GitLab CI/CD-componenten in `templates/` zijn een niet-draaiende referentie**, elk met
   `spec: inputs:` die 1-op-1 de parametersignatuur van het bijbehorende `ci/*.sh`-script volgt.
-  Root `.gitlab-ci.yml` toont hoe ze geconsumeerd worden. Beide zijn gemarkeerd als "draait niet
-  in deze GitHub-gehoste repo".
+  `templates/.gitlab-ci.yml.example` toont hoe ze geconsumeerd worden — **bewust niet in de
+  repo-root** en met een `.example`-extensie: een echte root-`.gitlab-ci.yml` zou bij een
+  eventuele GitLab-mirror automatisch oppikken en naast de draaiende GitHub Actions-laag een
+  tweede, ongewenste CI laten draaien. Alles in `templates/` is gemarkeerd als "draait niet in
+  deze GitHub-gehoste repo".
 - **Paths-filter-check bij elke deelsysteem-workflow:** moet ook de contract-directories bevatten
   van providers die het deelsysteem consumeert (niet alleen wat het zelf serveert) — anders merkt
   de consumer-pipeline een pin-bump niet op.
