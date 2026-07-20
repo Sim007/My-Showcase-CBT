@@ -47,3 +47,6 @@ __MACOSX/
 
 # Docker
 *.log
+
+# Demo-transparantie (onderdeel 9) — gegenereerd artefact, niet committen
+demo/grensrapport.md

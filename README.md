@@ -94,6 +94,23 @@ logica in de yaml zelf. Een aparte `diff-gate.yml`-workflow bewaakt `contracts/*
 GitLab CI/CD-component-templates in `templates/` zijn een niet-draaiende referentie-implementatie
 van dezelfde `ci/`-scripts, volgens de GitLab-componentconventie.
 
+## Demo's
+
+`demo/run.sh <scenario>` speelt een gate-scenario stapsgewijs af: uitgangssituatie tonen → breuk
+aanbrengen + diff tonen → gate draaien (FAIL) → terugdraaien + gate opnieuw (PASS). Enter-pauzes
+per stap; de presentator bepaalt het tempo, er wordt niets live getypt. Elk scenario draait de repo
+altijd volledig terug.
+
+| Scenario         | Bewijst                                                     | Live stack nodig |
+|------------------|--------------------------------------------------------------|-------------------|
+| `diff-gate`      | oasdiff blokkeert een breaking change in een gepubliceerd contract | Nee |
+| `consumer-stub`  | WireMock-consumervalidatie vangt een consumer die van het contract afwijkt | Nee (wel `mvn`) |
+| `healthcheck`    | een pin-mismatch tussen gepinde en geserveerde contractversie faalt bij deployment | Ja — `CBT-D/start.sh` |
+| `bonus-minor`    | een backward-compatible (optioneel veld) wijziging kost niets, ook zonder major-bump | Nee |
+
+`demo/grensrapport.sh` genereert `demo/grensrapport.md` (gegenereerd artefact, niet gecommit) met de
+rauwe `ci/healthcheck.sh`- en `ci/smoke.sh`-output voor alle grenzen — vereist een draaiende stack.
+
 ## Principes
 
 - **Provider is leading** — het contract wordt gepubliceerd door de provider, niet de consumer

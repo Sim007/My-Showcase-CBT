@@ -209,6 +209,20 @@ allang functioneel waren (onderdeel 2-7), en `templates/.gitlab-ci.yml.example` 
 vier gate-componenten zonder de tussenliggende `build`/`unit`/`docker-build`/`compose-up`-stappen.
 Beide bijgewerkt zodat de referentie weer 1-op-1 de draaiende laag weerspiegelt.
 
+## Demo-transparantie (onderdeel 9)
+
+`demo/run.sh <diff-gate|consumer-stub|healthcheck|bonus-minor>` verpakt drie al-bewezen
+mechanismen (onderdeel 0's diff-gate, onderdeel 2's WireMock-consumervalidatie, onderdeel 6's
+healthcheck) plus een bonusdemo in geleide, stapsgewijze scripts — geen nieuw gedrag, alleen
+presentatie. Vaste structuur per scenario: uitgangssituatie tonen → breuk aanbrengen + diff tonen →
+gate draaien (FAIL) → terugdraaien + gate opnieuw (PASS), met `pause()` (`read -rp`) tussen elke
+stap zodat de presentator het tempo bepaalt en er niets live getypt wordt (`run()` echoot het
+commando alsof het getypt is, voert het dan pas uit). Bewust geen `set -e` in het script: sommige
+stappen moeten een gate laten falen. `healthcheck` en `demo/grensrapport.sh` vereisen een draaiende
+lokale stack (`CBT-D/start.sh`) en controleren dat zelf; de andere drie scenario's niet.
+`demo/grensrapport.md` is een gegenereerd artefact (net als `playwright-report/`) — genegeerd door
+git, niet gecommit.
+
 ## Playwright-conventie (onderdeel 5)
 
 Response-validatie loopt via één herbruikbare fixture, `CBT-D/tests/fixtures/ajv-schema.ts`:
