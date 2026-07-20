@@ -25,9 +25,14 @@ naar buiten de tribe. Vol gate-regime (diff-gate, pins, healthcheck) geldt allee
 | Testmap                | Dekt                            | Contract                                        |
 |-------------------------|----------------------------------|--------------------------------------------------|
 | `CBT-D/tests/intern/`  | type 1: UI → eigen backend      | `contracts/order-create/1.0.0/openapi.yaml`<br>`contracts/order-lookup/1.0.0/openapi.yaml`<br>`contracts/notification-lookup/1.0.0/openapi.yaml`<br>`contracts/order-payment/1.0.0/openapi.yaml` (UI-kant) |
-| `CBT-D/tests/rest/`    | type 2 sync: Order → Payment, Payment → Notification | `contracts/order-payment/1.0.0/openapi.yaml`<br>`contracts/payment-notification-rest/1.0.0/openapi.yaml` |
+| `CBT-D/tests/rest/`    | type 2 sync: Order → Payment, Payment → Notification[^1] | `contracts/order-payment/1.0.0/openapi.yaml`<br>`contracts/payment-notification-rest/1.0.0/openapi.yaml`[^1] |
 | `CBT-D/tests/async/`   | type 2 async: Payment → Notification | `contracts/payment-notification/1.0.0/asyncapi.yaml` |
 | `CBT-D/tests/soap/`    | type 3: Payment → externe provider | `contracts/payment-external/1.0.0/payment.wsdl` |
+
+[^1]: `payment-notification-rest` is een **tweede, optionele** REST-grens tussen Payment en
+    Notification — een demonstratie van patroon-hergebruik, geen vierde primaire grens. Vol
+    gate-regime (diff-gate, pins, healthcheck) volgt hierop pas ná de drie primaire grenzen
+    (`order-payment`, `payment-notification`, `payment-external`); zie CLAUDE.md.
 
 ## Stack
 
