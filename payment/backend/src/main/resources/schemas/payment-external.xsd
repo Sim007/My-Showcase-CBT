@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Geëxtraheerd uit contracts/payment-external/1.0.0/payment.wsdl (het <xsd:schema>-blok in
+  <wsdl:types>). Bij een wijziging in de WSDL moet dit bestand handmatig opnieuw worden
+  afgeleid — zie CLAUDE.md.
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://showcase.nl/payment/external"
+            xmlns:tns="http://showcase.nl/payment/external">
+
+  <xsd:element name="AuthorizeRequest">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="orderId" type="xsd:string"/>
+        <xsd:element name="amount" type="xsd:decimal"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="AuthorizeResponse">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="transactionId" type="xsd:string"/>
+        <xsd:element name="approved" type="xsd:boolean"/>
+        <xsd:element name="reason" type="xsd:string" minOccurs="0"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+</xsd:schema>

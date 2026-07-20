@@ -101,6 +101,25 @@
       <version>1.5.6</version>
       <scope>test</scope>
     </dependency>
+
+    <!-- Onderdeel 4, SOAP-grens: PayloadValidatingInterceptor valideert uitgaande SOAP-requests
+         tegen contracts/payment-external/1.0.0/schemas/payment-external.xsd. Main-scope: raakt
+         productiecode (SoapClient), niet alleen tests. -->
+    <dependency>
+      <groupId>org.springframework.ws</groupId>
+      <artifactId>spring-ws-core</artifactId>
+      <version>4.0.13</version>
+    </dependency>
+
+    <!-- Onderdeel 4, testdouble voor de externe SOAP-provider: dezelfde shaded/standalone
+         WireMock-jar als onderdeel 2's Order-consumertest (bewezen conflictvrij met Spring
+         Boot's Jetty-BOM — zie CLAUDE.md). -->
+    <dependency>
+      <groupId>com.github.tomakehurst</groupId>
+      <artifactId>wiremock-jre8-standalone</artifactId>
+      <version>2.35.2</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

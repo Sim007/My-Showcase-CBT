@@ -47,6 +47,9 @@ jobs:
       - name: contractverificatie (payment-notification)
         run: ./ci/contract-verify.sh --contract payment-notification --side provider
 
+      - name: contractverificatie (payment-external)
+        run: ./ci/contract-verify.sh --contract payment-external --side consumer
+
       - name: docker build
         run: ./ci/docker-build.sh --service payment --context payment/backend --tag ${{ github.sha }}
 

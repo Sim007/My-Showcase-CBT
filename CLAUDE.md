@@ -43,10 +43,12 @@ In deze repo is dat omgedraaid — bewuste beslissing, vastgelegd tijdens het pl
   dependencies (nog geen WireMock-stub — die volgt in onderdeel 2 zonder dit mechanisme te
   wijzigen). Profiel `local` (gebruikt door `start.sh`/`sts.sh`) start alles.
 - **`ci/diff-gate.sh` is al functioneel** (niet als placeholder gebouwd) — bewijst demo-scenario 1
-  end-to-end. `ci/contract-verify.sh` is functioneel voor `--contract order-payment` (onderdeel 2)
-  en `--contract payment-notification` (onderdeel 3), beide `--side`-waarden; voor overige
-  contracten blijft het `NOT-IMPLEMENTED` (volgt in onderdeel 4, SOAP). `healthcheck.sh`/`smoke.sh`
-  zijn nog placeholders (onderdelen 6, 7).
+  end-to-end. `ci/contract-verify.sh` is functioneel voor alle vier de contracten uit de
+  bouwprompt: `order-payment` (onderdeel 2, beide kanten), `payment-notification` (onderdeel 3,
+  beide kanten), `payment-external` (onderdeel 4, alleen consumerkant — `--side provider` geeft
+  een expliciete "n.v.t., buiten de tribe"-melding, geen NOT-IMPLEMENTED). Overige,
+  niet-geïmplementeerde contractnamen vallen nog terug op `NOT-IMPLEMENTED`.
+  `healthcheck.sh`/`smoke.sh` zijn nog placeholders (onderdelen 6, 7).
 
 ## Contractverificatie-tooling (bevindingen uit onderdeel 2 — niet gokken, altijd verifiëren)
 
@@ -97,6 +99,43 @@ payload-schema was refloos genoeg om dit mechanisch te doen. **Wijzigt de AsyncA
 moet dit bestand handmatig opnieuw worden afgeleid (zie ook de "Contract gewijzigd"-checklist
 hieronder).
 
+## SOAP-contractverificatie (onderdeel 4)
+
+`contracts/payment-external/1.0.0/schemas/payment-external.xsd` is, zelfde patroon als
+onderdeel 3, **vooraf geëxtraheerd** uit het `<xsd:schema>`-blok in `<wsdl:types>` — de WSDL heeft
+geen losse `.xsd`. **Bewuste, gedocumenteerde uitzondering op "geen dubbele kopie":**
+`payment/backend/src/main/resources/schemas/payment-external.xsd` is een handmatig
+gesynchroniseerde kopie — eerst geprobeerd via een extra `<resource>`-blok in `pom.xml` dat
+rechtstreeks vanuit `contracts/` bundelde (zoals bij het pin-mechanisme uit onderdeel 1), maar dat
+faalt in productie: `docker build`'s buildcontext voor dit deelsysteem is beperkt tot
+`payment/backend/`, dus `contracts/` (erbuiten) is onbereikbaar tijdens de image-build — pas
+ontdekt door de echte `docker compose --profile payment up --build` te draaien, niet door alleen
+`mvn test` (die mount het hele repo). Bij een WSDL-schemawijziging moeten **beide** bestanden
+worden bijgewerkt (extra bullet in de "Contract gewijzigd"-checklist).
+
+Type 3 is **alleen consumerkant** (buiten de tribe): `SoapClient.kt` is gerefactored van een kale
+`RestTemplate` naar Spring-WS's `WebServiceTemplate` (zie `SoapConfig.kt`) — dat is de enige manier
+waarop `PayloadValidatingInterceptor` (client-side, package
+`org.springframework.ws.client.support.interceptor`, **niet**
+`org.springframework.ws.soap.server.endpoint.*` — dat is de serverkant-variant) uitgaande
+verzoeken kan valideren. `spring-ws-core:4.0.13` trekt zelf `jakarta.xml.soap-api` en
+`saaj-impl` mee — **geen** handmatige SAAJ-dependency nodig (in tegenstelling tot de JAXB-glue uit
+onderdeel 2, bevestigd via `mvn dependency:tree` vóórdat de rest gebouwd werd).
+
+**Alleen `setValidateRequest(true)`, niet de respons:** de bestaande WireMock-fixtures voor de
+externe provider (`CBT-D/wiremock/mappings/soap-authorize-*.json`) sturen namespace-gequalificeerde
+child-elementen (`tns:transactionId` etc.) terug, terwijl de WSDL-schema geen
+`elementFormDefault="qualified"` heeft — child-elementen horen dus ongekwalificeerd te zijn.
+Responsvalidatie zou daarom altijd stuklopen op bestaande, ongewijzigde fixtures. `SoapClient`'s
+eigen uitgaande payload bouwt daarom bewust ongekwalificeerde kinderen (`<orderId>`, `<amount>`,
+geen `tns:`-prefix, geen default-`xmlns`) onder een wél gekwalificeerd root-element
+(`<tns:AuthorizeRequest>`) — dat is wat de schema letterlijk voorschrijft.
+
+`PayloadValidatingInterceptor` implementeert `InitializingBean`; in productie roept Spring's
+bean-lifecycle `afterPropertiesSet()` vanzelf aan, maar in een test die de interceptor buiten een
+Spring-context instantieert (zoals `PaymentExternalContractTest.kt`, bewust snel/zonder
+`@SpringBootTest`) moet dat expliciet — anders blijft de interne `XmlValidator` `null`.
+
 Producer- (`payment/backend`) en consumertests (`notification/backend`) draaien met
 `com.networknt:json-schema-validator:1.5.6` (Apache 2.0, puur Jackson-gebaseerd — geen
 servlet/JAXB-koppeling zoals bij de tooling uit onderdeel 2) en hebben **geen live RabbitMQ-broker
@@ -128,6 +167,7 @@ Bij elke wijziging worden **alle onderstaande afhankelijkheden** in dezelfde taa
 - [ ] Pins van consumers alleen bumpen als dat de bedoeling van de taak is
 - [ ] Bijbehorende service-code, examples en specs (Playwright + provider-verificatie) bijwerken
 - [ ] Bij een AsyncAPI-payloadwijziging: het geëxtraheerde JSON Schema onder `contracts/<grens>/<versie>/schemas/` handmatig opnieuw afleiden
+- [ ] Bij een WSDL-schemawijziging: `contracts/payment-external/<versie>/schemas/payment-external.xsd` opnieuw afleiden **én** de kopie in `payment/backend/src/main/resources/schemas/` bijwerken (Docker-buildcontext kan `contracts/` niet bereiken — zie CLAUDE.md, onderdeel 4)
 - [ ] `README.md` — contractentabel
 
 ### Nieuwe API of endpoint toegevoegd

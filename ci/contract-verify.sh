@@ -7,7 +7,10 @@
 #                                   swagger-request-validator-wiremock-junit5 (consumerkant).
 #   --contract payment-notification (onderdeel 3, async): networknt json-schema-validator
 #                                   tegen het uit de AsyncAPI geëxtraheerde JSON Schema.
-# Overige contracten geven nog NOT-IMPLEMENTED (volgt in onderdeel 4, SOAP).
+#   --contract payment-external    (onderdeel 4, SOAP): Spring-WS PayloadValidatingInterceptor
+#                                   tegen het uit de WSDL geëxtraheerde XSD. Alleen consumerkant
+#                                   (type 3 — buiten de tribe, geen providerkant in scope).
+# Overige contracten geven nog NOT-IMPLEMENTED.
 #
 # Gebruik: ci/contract-verify.sh --contract <naam> --side provider|consumer
 set -euo pipefail
@@ -134,13 +137,35 @@ $MVN_OUTPUT" \
   exit 0
 }
 
+verify_payment_external_consumer() {
+  local module="$ROOT/payment/backend"
+  run_mvn_test "$module" "PaymentExternalContractTest"
+
+  if [ "$MVN_EXIT" -ne 0 ]; then
+    gate_fail "mvn test (PaymentExternalContractTest) faalde:
+$MVN_OUTPUT" \
+      "het uitgaande SOAP-verzoek naar de externe betaalprovider wijkt af van de gepinde WSDL/XSD — de PayloadValidatingInterceptor ving dit vóór een release."
+    exit 1
+  fi
+
+  gate_pass "mvn test (PaymentExternalContractTest): uitgaande Authorize-verzoeken (approved en rejected-pad) voldoen aan contracts/payment-external/1.0.0/payment.wsdl." \
+    "Payment's uitgaande SOAP-verzoeken zijn spec-conform, en het detectiemechanisme voor niet-conforme verzoeken werkt."
+  exit 0
+}
+
 case "$CONTRACT-$SIDE" in
   order-payment-provider) verify_order_payment_provider ;;
   order-payment-consumer) verify_order_payment_consumer ;;
   payment-notification-provider) verify_payment_notification_provider ;;
   payment-notification-consumer) verify_payment_notification_consumer ;;
+  payment-external-consumer) verify_payment_external_consumer ;;
+  payment-external-provider)
+    gate_pass "n.v.t. — payment-external is type 3 (buiten de tribe): alleen de consumerkant (Payment als SOAP-client) valt binnen het gate-regime." \
+      "een grens naar buiten de tribe heeft geen providerkant om te verifiëren — dit is een architecturale keuze, geen ontbrekend onderdeel."
+    exit 0
+    ;;
   *-provider|*-consumer)
-    gate_not_implemented "contract-verify" "4"
+    gate_not_implemented "contract-verify" "geen — alle contracten uit de bouwprompt zijn nu gedekt"
     exit 0
     ;;
   *)
