@@ -41,8 +41,11 @@ jobs:
         working-directory: payment/backend
         run: mvn test
 
-      - name: contractverificatie
+      - name: contractverificatie (order-payment)
         run: ./ci/contract-verify.sh --contract order-payment --side provider
+
+      - name: contractverificatie (payment-notification)
+        run: ./ci/contract-verify.sh --contract payment-notification --side provider
 
       - name: docker build
         run: ./ci/docker-build.sh --service payment --context payment/backend --tag ${{ github.sha }}

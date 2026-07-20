@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
-# ci/contract-verify.sh — providerkant (swagger-request-validator-core, zie CLAUDE.md voor
-# waarom niet de -mockmvc-adapter, + springdoc-drift-check) en consumerkant (WireMock-stub +
-# swagger-request-validator-wiremock-junit5) contractverificatie.
+# ci/contract-verify.sh — providerkant en consumerkant contractverificatie, per grens.
 #
-# Functioneel voor --contract order-payment (onderdeel 2). Overige contracten geven nog
-# NOT-IMPLEMENTED (volgt in de onderdelen 3-4).
+# Functioneel voor:
+#   --contract order-payment       (onderdeel 2, REST): swagger-request-validator-core
+#                                   (providerkant, + springdoc-drift-check) en
+#                                   swagger-request-validator-wiremock-junit5 (consumerkant).
+#   --contract payment-notification (onderdeel 3, async): networknt json-schema-validator
+#                                   tegen het uit de AsyncAPI geëxtraheerde JSON Schema.
+# Overige contracten geven nog NOT-IMPLEMENTED (volgt in onderdeel 4, SOAP).
 #
 # Gebruik: ci/contract-verify.sh --contract <naam> --side provider|consumer
 set -euo pipefail
@@ -32,18 +35,19 @@ fi
 
 gate_header "contract-verify" "$CONTRACT" "$CONTRACT@1.0.0 ($SIDE-kant)" "$SIDE"
 
-if [ "$CONTRACT" != "order-payment" ]; then
-  gate_not_implemented "contract-verify" "3-4"
-  exit 0
-fi
-
-if [ "$SIDE" = "provider" ]; then
-  MODULE="$ROOT/payment/backend"
-
+# run_mvn_test <module-pad> <testklasse>
+# Zet MVN_OUTPUT/MVN_EXIT; gebruikt geen 'local' buiten een functie-context nodig hier.
+run_mvn_test() {
+  local module="$1" test_class="$2"
   set +e
-  MVN_OUTPUT="$(cd "$MODULE" && mvn -B -q -Dtest=PaymentProviderContractTest test 2>&1)"
+  MVN_OUTPUT="$(cd "$module" && mvn -B -q -Dtest="$test_class" test 2>&1)"
   MVN_EXIT=$?
   set -e
+}
+
+verify_order_payment_provider() {
+  local module="$ROOT/payment/backend"
+  run_mvn_test "$module" "PaymentProviderContractTest"
 
   if [ "$MVN_EXIT" -ne 0 ]; then
     gate_fail "mvn test (PaymentProviderContractTest) faalde:
@@ -52,25 +56,26 @@ $MVN_OUTPUT" \
     exit 1
   fi
 
-  GENERATED_SPEC="$MODULE/target/generated-openapi.json"
-  PUBLISHED_SPEC="$ROOT/contracts/order-payment/1.0.0/openapi.yaml"
+  local generated_spec="$module/target/generated-openapi.json"
+  local published_spec="$ROOT/contracts/order-payment/1.0.0/openapi.yaml"
 
-  if [ ! -f "$GENERATED_SPEC" ]; then
-    gate_fail "Geen gegenereerde spec gevonden op $GENERATED_SPEC (springdoc-drift-check kon niet draaien)." \
+  if [ ! -f "$generated_spec" ]; then
+    gate_fail "Geen gegenereerde spec gevonden op $generated_spec (springdoc-drift-check kon niet draaien)." \
       "zonder gegenereerde spec kan niet worden bewezen dat code en contract synchroon lopen."
     exit 1
   fi
 
   set +e
-  DRIFT_OUTPUT="$(docker run --rm \
-    -v "$PUBLISHED_SPEC:/published.yaml:ro" \
-    -v "$GENERATED_SPEC:/generated.yaml:ro" \
+  local drift_output
+  drift_output="$(docker run --rm \
+    -v "$published_spec:/published.yaml:ro" \
+    -v "$generated_spec:/generated.yaml:ro" \
     tufin/oasdiff diff /published.yaml /generated.yaml 2>&1)"
   set -e
 
-  if [ -n "$(echo "$DRIFT_OUTPUT" | tr -d '[:space:]')" ]; then
+  if [ -n "$(echo "$drift_output" | tr -d '[:space:]')" ]; then
     gate_fail "springdoc-drift-check: gegenereerde spec wijkt af van de gepubliceerde spec:
-$DRIFT_OUTPUT" \
+$drift_output" \
       "de live Payment-API en het gepubliceerde contract zijn uit sync geraakt — dit voorkomt dat een stilzwijgend afwijkende implementatie ongemerkt blijft."
     exit 1
   fi
@@ -79,15 +84,11 @@ $DRIFT_OUTPUT" \
 springdoc-drift-check: geen afwijking tussen gegenereerde en gepubliceerde spec." \
     "Payment's daadwerkelijke gedrag komt exact overeen met het gepubliceerde contract, nu en structureel (drift-check)."
   exit 0
-fi
+}
 
-if [ "$SIDE" = "consumer" ]; then
-  MODULE="$ROOT/order/backend"
-
-  set +e
-  MVN_OUTPUT="$(cd "$MODULE" && mvn -B -q -Dtest=OrderPaymentConsumerContractTest test 2>&1)"
-  MVN_EXIT=$?
-  set -e
+verify_order_payment_consumer() {
+  local module="$ROOT/order/backend"
+  run_mvn_test "$module" "OrderPaymentConsumerContractTest"
 
   if [ "$MVN_EXIT" -ne 0 ]; then
     gate_fail "mvn test (OrderPaymentConsumerContractTest) faalde:
@@ -99,7 +100,51 @@ $MVN_OUTPUT" \
   gate_pass "mvn test (OrderPaymentConsumerContractTest): elk verzoek van Order naar de Payment-stub voldoet aan contracts/order-payment/1.0.0/openapi.yaml." \
     "Order's uitgaande aanroepen zijn spec-conform — een regressie hierin faalt de consumerkant-gate direct."
   exit 0
-fi
+}
 
-echo "Onbekende --side: $SIDE (verwacht provider of consumer)" >&2
-exit 2
+verify_payment_notification_provider() {
+  local module="$ROOT/payment/backend"
+  run_mvn_test "$module" "PaymentNotificationProducerContractTest"
+
+  if [ "$MVN_EXIT" -ne 0 ]; then
+    gate_fail "mvn test (PaymentNotificationProducerContractTest) faalde:
+$MVN_OUTPUT" \
+      "het bericht dat Payment naar de payment.notifications-queue publiceert wijkt af van de gepinde AsyncAPI-payload — providerkant-verificatie stopt dit vóór een release."
+    exit 1
+  fi
+
+  gate_pass "mvn test (PaymentNotificationProducerContractTest): gepubliceerde berichten (approved en rejected) voldoen aan contracts/payment-notification/1.0.0/asyncapi.yaml." \
+    "Payment's daadwerkelijke queue-berichten komen overeen met het gepubliceerde AsyncAPI-contract."
+  exit 0
+}
+
+verify_payment_notification_consumer() {
+  local module="$ROOT/notification/backend"
+  run_mvn_test "$module" "NotificationConsumerContractTest"
+
+  if [ "$MVN_EXIT" -ne 0 ]; then
+    gate_fail "mvn test (NotificationConsumerContractTest) faalde:
+$MVN_OUTPUT" \
+      "een inkomend bericht wijkt af van de gepinde AsyncAPI-payload, of Notification verwerkt een conform bericht niet correct."
+    exit 1
+  fi
+
+  gate_pass "mvn test (NotificationConsumerContractTest): een schema-conform bericht wordt correct verwerkt; een bericht zonder verplicht veld wordt door de schema-validator gevangen." \
+    "Notification's consumptie van payment.notifications is spec-conform, en het detectiemechanisme voor niet-conforme berichten werkt."
+  exit 0
+}
+
+case "$CONTRACT-$SIDE" in
+  order-payment-provider) verify_order_payment_provider ;;
+  order-payment-consumer) verify_order_payment_consumer ;;
+  payment-notification-provider) verify_payment_notification_provider ;;
+  payment-notification-consumer) verify_payment_notification_consumer ;;
+  *-provider|*-consumer)
+    gate_not_implemented "contract-verify" "4"
+    exit 0
+    ;;
+  *)
+    echo "Onbekende --side: $SIDE (verwacht provider of consumer)" >&2
+    exit 2
+    ;;
+esac

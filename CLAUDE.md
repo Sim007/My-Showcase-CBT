@@ -43,9 +43,10 @@ In deze repo is dat omgedraaid — bewuste beslissing, vastgelegd tijdens het pl
   dependencies (nog geen WireMock-stub — die volgt in onderdeel 2 zonder dit mechanisme te
   wijzigen). Profiel `local` (gebruikt door `start.sh`/`sts.sh`) start alles.
 - **`ci/diff-gate.sh` is al functioneel** (niet als placeholder gebouwd) — bewijst demo-scenario 1
-  end-to-end. `ci/contract-verify.sh` is functioneel voor `--contract order-payment` (onderdeel 2,
-  beide `--side`-waarden); voor overige contracten blijft het `NOT-IMPLEMENTED` (volgt in de
-  onderdelen 3-4). `healthcheck.sh`/`smoke.sh` zijn nog placeholders (onderdelen 6, 7).
+  end-to-end. `ci/contract-verify.sh` is functioneel voor `--contract order-payment` (onderdeel 2)
+  en `--contract payment-notification` (onderdeel 3), beide `--side`-waarden; voor overige
+  contracten blijft het `NOT-IMPLEMENTED` (volgt in onderdeel 4, SOAP). `healthcheck.sh`/`smoke.sh`
+  zijn nog placeholders (onderdelen 6, 7).
 
 ## Contractverificatie-tooling (bevindingen uit onderdeel 2 — niet gokken, altijd verifiëren)
 
@@ -87,6 +88,23 @@ gevonden die bij een volgend contract (onderdelen 3-4) weer kunnen opduiken:
   `payment/backend/src/main/kotlin/nl/showcase/payment/config/OpenApiConfig.kt` en de annotaties in
   `PaymentController.kt`.
 
+## Async-contractverificatie (onderdeel 3)
+
+`contracts/payment-notification/1.0.0/schemas/payment-notification-payload.schema.json` is een
+**vooraf geëxtraheerd, standalone JSON Schema** (draft-07), 1:1 overgenomen uit
+`components.schemas.PaymentNotificationPayload` in de AsyncAPI. Geen buildstap — de
+payload-schema was refloos genoeg om dit mechanisch te doen. **Wijzigt de AsyncAPI-payload,** dan
+moet dit bestand handmatig opnieuw worden afgeleid (zie ook de "Contract gewijzigd"-checklist
+hieronder).
+
+Producer- (`payment/backend`) en consumertests (`notification/backend`) draaien met
+`com.networknt:json-schema-validator:1.5.6` (Apache 2.0, puur Jackson-gebaseerd — geen
+servlet/JAXB-koppeling zoals bij de tooling uit onderdeel 2) en hebben **geen live RabbitMQ-broker
+nodig**: `PaymentService`/`NotificationService` hebben alleen constructor-dependencies, dus
+rechtstreeks geïnstantieerd (met Mockito voor Payment's externe calls) in plaats van via een
+`@SpringBootTest`. Consistent met de vaste pijplijnvolgorde: contractverificatie loopt vóór
+compose-up, dus vóór er een broker draait.
+
 ## Terminologie
 
 **Type is een eigenschap van de interface**, conform het keuzedocument: **type 1** = intern binnen een deelsysteem, **type 2** = grens tussen deelsystemen binnen de tribe (sync én async), **type 3** = grens naar een systeem buiten de tribe. Het keuzedocument en het gate-regime focussen op de grenzen (type 2 en de consumerkant van type 3); type 1 valt onder squad-autonomie. Testmappen gebruiken géén typenummers maar sprekende namen — zo kan de nummering nooit botsen:
@@ -109,6 +127,7 @@ Bij elke wijziging worden **alle onderstaande afhankelijkheden** in dezelfde taa
 - [ ] `ci/diff-gate.sh` draaien tegen de vorige versie; bij onbedoelde breaking change: stoppen en melden
 - [ ] Pins van consumers alleen bumpen als dat de bedoeling van de taak is
 - [ ] Bijbehorende service-code, examples en specs (Playwright + provider-verificatie) bijwerken
+- [ ] Bij een AsyncAPI-payloadwijziging: het geëxtraheerde JSON Schema onder `contracts/<grens>/<versie>/schemas/` handmatig opnieuw afleiden
 - [ ] `README.md` — contractentabel
 
 ### Nieuwe API of endpoint toegevoegd

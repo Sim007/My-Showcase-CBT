@@ -60,6 +60,16 @@
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!-- Onderdeel 3, async-grens: valideert een inkomend RabbitMQ-bericht tegen het uit
+         contracts/payment-notification/1.0.0/asyncapi.yaml geëxtraheerde JSON Schema. Pure
+         Jackson-library, geen servlet/JAXB-koppeling. -->
+    <dependency>
+      <groupId>com.networknt</groupId>
+      <artifactId>json-schema-validator</artifactId>
+      <version>1.5.6</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

@@ -90,6 +90,17 @@
       <artifactId>jaxb-api</artifactId>
       <version>2.3.1</version>
     </dependency>
+
+    <!-- Onderdeel 3, async-grens: valideert het uitgaande RabbitMQ-bericht tegen het uit
+         contracts/payment-notification/1.0.0/asyncapi.yaml geëxtraheerde JSON Schema. Pure
+         Jackson-library, geen servlet/JAXB-koppeling — geen compatibiliteitsrisico zoals bij de
+         dependencies hierboven. -->
+    <dependency>
+      <groupId>com.networknt</groupId>
+      <artifactId>json-schema-validator</artifactId>
+      <version>1.5.6</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

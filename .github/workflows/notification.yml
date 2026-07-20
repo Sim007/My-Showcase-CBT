@@ -40,7 +40,7 @@ jobs:
         run: mvn test
 
       - name: contractverificatie
-        run: ./ci/contract-verify.sh --contract payment-notification --side provider
+        run: ./ci/contract-verify.sh --contract payment-notification --side consumer
 
       - name: docker build
         run: ./ci/docker-build.sh --service notification --context notification/backend --tag ${{ github.sha }}

@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PaymentNotificationPayload",
+  "description": "Geëxtraheerd uit contracts/payment-notification/1.0.0/asyncapi.yaml (components.schemas.PaymentNotificationPayload). Bij een wijziging in de AsyncAPI-schema moet dit bestand handmatig opnieuw worden afgeleid — zie CLAUDE.md.",
+  "type": "object",
+  "required": ["notificationId", "orderId", "type", "message", "timestamp"],
+  "properties": {
+    "notificationId": {
+      "type": "string",
+      "examples": ["notif-001"]
+    },
+    "orderId": {
+      "type": "string",
+      "examples": ["order-123"]
+    },
+    "type": {
+      "type": "string",
+      "enum": ["PAYMENT_APPROVED", "PAYMENT_REJECTED"]
+    },
+    "message": {
+      "type": "string",
+      "examples": ["Betaling voor order order-123 is goedgekeurd"]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "examples": ["2026-05-08T10:00:00Z"]
+    }
+  }
+}
