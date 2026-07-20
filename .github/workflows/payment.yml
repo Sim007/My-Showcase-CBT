@@ -61,7 +61,7 @@ jobs:
         run: ./ci/healthcheck.sh --boundary order-payment
 
       - name: keten-smoke
-        run: ./ci/smoke.sh --boundary order-payment
+        run: ./ci/smoke.sh
 
       - name: Set up Node.js
         uses: actions/setup-node@v4

@@ -48,8 +48,8 @@ In deze repo is dat omgedraaid — bewuste beslissing, vastgelegd tijdens het pl
   beide kanten), `payment-external` (onderdeel 4, alleen consumerkant — `--side provider` geeft
   een expliciete "n.v.t., buiten de tribe"-melding, geen NOT-IMPLEMENTED). Overige,
   niet-geïmplementeerde contractnamen vallen nog terug op `NOT-IMPLEMENTED`.
-  `ci/healthcheck.sh` is functioneel (onderdeel 6, zie eigen sectie hieronder). `smoke.sh` is nog
-  een placeholder (onderdeel 7).
+  `ci/healthcheck.sh` en `ci/smoke.sh` zijn functioneel (onderdelen 6 en 7, zie eigen secties
+  hieronder). Alle vijf de gate-scripts uit de bouwprompt zijn nu gebouwd.
 
 ## Contractverificatie-tooling (bevindingen uit onderdeel 2 — niet gokken, altijd verifiëren)
 
@@ -179,6 +179,23 @@ volgt dezelfde stijl i.p.v. een nieuwe dependency te introduceren. `--boundary <
 containers herbouwd, `/actuator/info` bevestigde de mismatch, en `ci/healthcheck.sh --boundary
 order-payment` gaf exact `FAIL order-payment: pinned 2.5.0, served 2.3.0` met exit 1 (exit 0 met
 `--report-only`). Daarna volledig teruggedraaid.
+
+## Keten-smoke (onderdeel 7)
+
+`ci/smoke.sh` doet **één** `POST /api/payments` (rechtstreeks naar Payment, niet via Order) en
+leidt daar per grens een eigen assertie uit af: `order-payment` (200 + `paymentId`/`status`
+aanwezig), `payment-external` (`approved == true` — indirect bewijs van de SOAP-roundtrip),
+`payment-notification` (korte poll op `GET /api/notifications` tot een `PAYMENT_APPROVED`
+verschijnt). **Bewust niet via Order**: `order` staat niet in `payment`'s of `notification`'s
+compose-profiel (onderdeel 0/6), maar `payment-backend` staat in alle drie — dat maakt één
+rechtstreekse aanroep naar Payment de enige smoke-actie die overal werkt én toch alle drie de
+grenzen raakt (`processPayment()` is zelf de providerkant van `order-payment`, publiceert naar
+RabbitMQ, en roept de externe SOAP-provider aan). Geen `--report-only` (niet gevraagd voor dit
+onderdeel, in tegenstelling tot diff-gate/healthcheck).
+
+**Bugfix, zelfde soort als notification.yml in onderdeel 3:** `payment.yml`'s keten-smoke-stap
+checkte alleen `--boundary order-payment`, terwijl Payment zelf alle drie de grenzen raakt — nu
+`./ci/smoke.sh` zonder vlag (alle drie).
 
 ## Playwright-conventie (onderdeel 5)
 
