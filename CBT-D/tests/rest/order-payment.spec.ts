@@ -1,13 +1,13 @@
 import { test, expect } from '@playwright/test';
 import { assertMatchesSchema } from '../fixtures/ajv-schema';
 
-// Type 1: Tussen deelsystemen — Order service roept Payment service aan via REST
+// Type 2: Grens tussen deelsystemen binnen de tribe — Order service roept Payment service aan via REST
 // Contract: contracts/order-payment/1.0.0/openapi.yaml
 
 const ORDER_URL = process.env.ORDER_URL ?? 'http://localhost:8080';
 const CONTRACT = 'order-payment/1.0.0/openapi.yaml';
 
-test.describe('Type 1 – Contract: Order→Payment (REST)', () => {
+test.describe('Type 2 – Contract: Order→Payment (REST)', () => {
 
   test('POST /api/orders triggert betaling en retourneert APPROVED', async ({ request }) => {
     const res = await request.post(`${ORDER_URL}/api/orders`, {

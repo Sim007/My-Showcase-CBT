@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
 
-// Type 0: Portal shell laadt mf-order via Module Federation → /orders
+// Type 1: Portal shell laadt mf-order via Module Federation → /orders
 
 const SHELL = 'http://localhost:4200';
 
-test.describe('Type 0 – mf-order: order aanmaken (POST /api/orders)', () => {
+test.describe('Type 1 – mf-order: order aanmaken (POST /api/orders)', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto(`${SHELL}/orders`);

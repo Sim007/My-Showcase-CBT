@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { assertMatchesSchema, getSchema } from '../fixtures/ajv-schema';
 
-// Type 1: Tussen deelsystemen — Payment service (consumer) → Notification service (provider) via REST
+// Type 2: Grens tussen deelsystemen binnen de tribe — Payment service (consumer) → Notification service (provider) via REST
 // Contract: contracts/payment-notification-rest/1.0.0/openapi.yaml
 
 const PAYMENT_URL      = process.env.PAYMENT_URL      ?? 'http://localhost:8081';
@@ -9,7 +9,7 @@ const NOTIFICATION_URL = process.env.NOTIFICATION_URL ?? 'http://localhost:8082'
 const CONTRACT = 'payment-notification-rest/1.0.0/openapi.yaml';
 const allowedTypes = getSchema(CONTRACT, 'CreateNotificationRequest').properties.type.enum as string[];
 
-test.describe('Type 1 – Contract: Payment→Notification (REST POST /api/notifications)', () => {
+test.describe('Type 2 – Contract: Payment→Notification (REST POST /api/notifications)', () => {
 
   test('na betaling maakt Payment direct een REST-notificatie aan in Notification', async ({ request }) => {
     const orderId = `order-rest-notif-${Date.now()}`;

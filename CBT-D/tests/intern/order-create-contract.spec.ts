@@ -7,7 +7,7 @@ import { assertMatchesSchema, getSchema } from '../fixtures/ajv-schema';
 const ORDER_URL = process.env.ORDER_URL ?? 'http://localhost:8080';
 const CONTRACT = 'order-create/1.0.0/openapi.yaml';
 
-test.describe('Type 0 – Contract: POST /api/orders (order-create/openapi.yaml)', () => {
+test.describe('Type 1 – Contract: POST /api/orders (order-create/openapi.yaml)', () => {
 
   test('request voldoet aan CreateOrderRequest schema', () => {
     assertMatchesSchema(CONTRACT, 'CreateOrderRequest', { amount: 49.95 });

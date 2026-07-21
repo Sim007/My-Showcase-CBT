@@ -58,7 +58,7 @@ jobs:
         run: docker compose -f docker-compose.yml -f docker-compose.ci.yml --profile payment up -d --build
 
       - name: healthcheck
-        run: ./ci/healthcheck.sh --boundary order-payment
+        run: ./ci/healthcheck.sh
 
       - name: keten-smoke
         run: ./ci/smoke.sh

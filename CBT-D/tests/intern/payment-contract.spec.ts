@@ -7,7 +7,7 @@ import { assertMatchesSchema } from '../fixtures/ajv-schema';
 const PAYMENT_URL = process.env.PAYMENT_URL ?? 'http://localhost:8081';
 const CONTRACT = 'order-payment/1.0.0/openapi.yaml';
 
-test.describe('Type 0 – Contract: POST /api/payments (order-payment/openapi.yaml)', () => {
+test.describe('Type 1 – Contract: POST /api/payments (order-payment/openapi.yaml)', () => {
 
   test('request voldoet aan PaymentRequest schema', () => {
     assertMatchesSchema(CONTRACT, 'PaymentRequest', { orderId: 'order-c0-001', amount: 49.95 });

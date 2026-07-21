@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
 
-// Type 0: Portal shell laadt mf-notifications via Module Federation → /notifications
+// Type 1: Portal shell laadt mf-notifications via Module Federation → /notifications
 
 const SHELL = 'http://localhost:4200';
 
-test.describe('Type 0 – mf-notifications: notificaties opzoeken (GET /api/notifications)', () => {
+test.describe('Type 1 – mf-notifications: notificaties opzoeken (GET /api/notifications)', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto(`${SHELL}/notifications`);

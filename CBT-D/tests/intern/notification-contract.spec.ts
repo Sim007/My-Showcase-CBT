@@ -9,7 +9,7 @@ const NOTIFICATION_URL = process.env.NOTIFICATION_URL ?? 'http://localhost:8082'
 const CONTRACT = 'notification-lookup/1.0.0/openapi.yaml';
 const allowedTypes = getSchema(CONTRACT, 'NotificationResponse').properties.type.enum as string[];
 
-test.describe('Type 0 – Contract: GET /api/notifications (notification-lookup/openapi.yaml)', () => {
+test.describe('Type 1 – Contract: GET /api/notifications (notification-lookup/openapi.yaml)', () => {
 
   test('lege lijst retourneert 200 met array', async ({ request }) => {
     const res = await request.get(`${NOTIFICATION_URL}/api/notifications?orderId=order-nooit-geweest`);

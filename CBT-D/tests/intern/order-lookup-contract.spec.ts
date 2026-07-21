@@ -7,7 +7,7 @@ import { assertMatchesSchema } from '../fixtures/ajv-schema';
 const ORDER_URL = process.env.ORDER_URL ?? 'http://localhost:8080';
 const CONTRACT = 'order-lookup/1.0.0/openapi.yaml';
 
-test.describe('Type 0 – Contract: GET /api/orders/{id} (order-lookup/openapi.yaml)', () => {
+test.describe('Type 1 – Contract: GET /api/orders/{id} (order-lookup/openapi.yaml)', () => {
 
   test('response voldoet aan OrderResponse schema', async ({ request }) => {
     // Maak eerst een order aan om een geldig ID te hebben

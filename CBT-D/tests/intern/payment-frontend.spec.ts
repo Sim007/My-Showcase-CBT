@@ -1,11 +1,11 @@
 import { test, expect } from '@playwright/test';
 
-// Type 0: Binnen deelsysteem — Portal shell laadt mf-payments via Module Federation
+// Type 1: Binnen deelsysteem — Portal shell laadt mf-payments via Module Federation
 // Shell: poort 4200 | mf-payments: poort 4202
 
 const SHELL = 'http://localhost:4200';
 
-test.describe('Type 0 – Portal: navigatie (shell)', () => {
+test.describe('Type 1 – Portal: navigatie (shell)', () => {
 
   test('welkomscherm toont bij root-URL', async ({ page }) => {
     await page.goto(SHELL);
@@ -48,7 +48,7 @@ test.describe('Type 0 – Portal: navigatie (shell)', () => {
   });
 });
 
-test.describe('Type 0 – mf-payments: betaalformulier', () => {
+test.describe('Type 1 – mf-payments: betaalformulier', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto(`${SHELL}/payments`);
